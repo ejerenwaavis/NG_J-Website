@@ -2352,3 +2352,83 @@
                 bottom: 90px;
             }
         }
+
+        /* ═══════════════════════════════════
+   UICONS — THIN ROUNDED COLORS
+   Replaces emoji icons with Flaticon icon font
+═══════════════════════════════════ */
+        .hc-icon.o i[class^="fi-tr-"],
+        .hc-icon.o i[class*=" fi-tr-"] {
+            color: var(--orange);
+            font-size: 20px;
+        }
+
+        .hc-icon.b i[class^="fi-tr-"],
+        .hc-icon.b i[class*=" fi-tr-"] {
+            color: var(--navy);
+            font-size: 20px;
+        }
+
+        .pill-icon i[class^="fi-tr-"],
+        .pill-icon i[class*=" fi-tr-"] {
+            color: var(--orange);
+            font-size: 17px;
+        }
+
+        .vc-emoji i[class^="fi-tr-"],
+        .vc-emoji i[class*=" fi-tr-"] {
+            color: var(--orange);
+            font-size: 38px;
+            display: block;
+            line-height: 1;
+        }
+
+        .vtag-icon i[class^="fi-tr-"],
+        .vtag-icon i[class*=" fi-tr-"] {
+            color: var(--orange);
+            font-size: 14px;
+        }
+
+        .ps-circle i[class^="fi-tr-"],
+        .ps-circle i[class*=" fi-tr-"] {
+            color: var(--navy);
+            font-size: 26px;
+        }
+
+        .ps.active .ps-circle i[class^="fi-tr-"],
+        .ps.active .ps-circle i[class*=" fi-tr-"] {
+            color: var(--orange);
+        }
+
+        .wi-icon i[class^="fi-tr-"],
+        .wi-icon i[class*=" fi-tr-"] {
+            color: var(--orange);
+            font-size: 19px;
+        }
+
+        .cd-icon i[class^="fi-tr-"],
+        .cd-icon i[class*=" fi-tr-"] {
+            color: var(--orange);
+            font-size: 18px;
+        }
+
+        .sm-icon i[class^="fi-tr-"],
+        .sm-icon i[class*=" fi-tr-"] {
+            color: var(--orange);
+            font-size: 48px;
+            display: block;
+            line-height: 1;
+        }
+
+        .float-icon i[class^="fi-tr-"],
+        .float-icon i[class*=" fi-tr-"] {
+            font-size: 16px;
+            color: white;
+        }
+
+        /* calculator inline icon boxes */
+        div[style*="rgba(232,82,10,0.15)"] i[class^="fi-tr-"],
+        div[style*="rgba(232,82,10,0.15)"] i[class*=" fi-tr-"] {
+            color: var(--orange);
+            font-size: 16px;
+        }
