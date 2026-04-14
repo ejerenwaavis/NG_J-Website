@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — NG&J Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            orange:     '#E8520A',
+            'orange-lt':'#FF6B2B',
+            navy:       '#0F1E33',
+            'navy-mid': '#1A2E4A',
+            'navy-lt':  '#233A5C',
+            slate:      '#4A5568',
+            silver:     '#8EA0B4',
+            mist:       '#F4F1EC',
+          },
+          fontFamily: {
+            sora:  ['Sora','sans-serif'],
+            bebas: ['"Bebas Neue"','cursive'],
+          },
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family:'Sora',sans-serif; }
+    ::-webkit-scrollbar { width:6px; height:6px; }
+    ::-webkit-scrollbar-track { background:transparent; }
+    ::-webkit-scrollbar-thumb { background:#233A5C; border-radius:99px; }
+    .sidebar-link { transition: all .15s; }
+    .sidebar-link.active { background:rgba(232,82,10,.15); color:#FF6B2B; border-left:3px solid #E8520A; }
+    .sidebar-link:not(.active):hover { background:rgba(255,255,255,.05); }
+    .section { display:none; }
+    .section.active { display:block; }
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.65); z-index:50; align-items:center; justify-content:center; }
+    .modal-overlay.open { display:flex; }
+    @keyframes modal-in { from { opacity:0; transform:scale(.95) translateY(12px); } to { opacity:1; transform:scale(1) translateY(0); } }
+    .modal-box { animation:modal-in .25s ease; max-height:90vh; overflow-y:auto; }
+    .toast { position:fixed; bottom:24px; right:24px; z-index:999; transition:all .3s; transform:translateY(100px); opacity:0; }
+    .toast.show { transform:translateY(0); opacity:1; }
+    input, select, textarea {
+      background:#0F1E33; border:1px solid #233A5C; color:#fff; border-radius:8px;
+      padding:10px 14px; width:100%; font-family:'Sora',sans-serif; font-size:13px;
+      transition:border-color .2s, box-shadow .2s;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline:none; border-color:#E8520A; box-shadow:0 0 0 3px rgba(232,82,10,.18);
+    }
+    input::placeholder, textarea::placeholder { color:#4A5568; }
+    select option { background:#0F1E33; }
+    label { display:block; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.08em; color:#8EA0B4; margin-bottom:6px; }
+    .badge-featured { background:rgba(232,82,10,.15); color:#FF6B2B; font-size:11px; padding:2px 8px; border-radius:99px; border:1px solid rgba(232,82,10,.3); }
+    .badge-active { background:rgba(34,197,94,.12); color:#4ade80; font-size:11px; padding:2px 8px; border-radius:99px; border:1px solid rgba(34,197,94,.25); }
+    .badge-inactive { background:rgba(148,163,184,.1); color:#94a3b8; font-size:11px; padding:2px 8px; border-radius:99px; border:1px solid rgba(148,163,184,.2); }
+    tr:hover td { background:rgba(255,255,255,.02); }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .spin { animation:spin .7s linear infinite; }
+  </style>
+</head>
+<body class="bg-navy text-white min-h-screen flex">
+
+<!-- ═══════════════ SIDEBAR ═══════════════ -->
+<aside class="w-64 bg-navy-mid border-r border-navy-lt flex flex-col flex-shrink-0 fixed inset-y-0 left-0 z-20">
+  <!-- Logo -->
+  <div class="px-6 py-5 border-b border-navy-lt">
+    <div class="font-bebas text-2xl tracking-widest">NG<span class="text-orange">&amp;</span>J SWIFT</div>
+    <div class="text-silver text-xs mt-0.5">Admin Dashboard</div>
+  </div>
+
+  <!-- Admin info -->
+  <div class="px-6 py-4 border-b border-navy-lt flex items-center gap-3">
+    <div class="w-9 h-9 rounded-xl bg-orange flex items-center justify-center text-white font-bold text-sm flex-shrink-0" id="adminInitial">A</div>
+    <div class="min-w-0">
+      <div class="text-sm font-medium text-white truncate" id="adminName">Admin</div>
+      <div class="text-xs text-silver truncate" id="adminEmail">—</div>
+    </div>
+  </div>
+
+  <!-- Nav -->
+  <nav class="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+    <a href="#" class="sidebar-link active flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-white" data-section="overview">
+      <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Overview
+    </a>
+    <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-silver" data-section="projects">
+      <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/></svg>
+      Projects
+    </a>
+    <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-silver" data-section="services">
+      <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+      Services
+    </a>
+    <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-silver" data-section="team">
+      <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+      Team
+    </a>
+    <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-silver" data-section="testimonials">
+      <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      Testimonials
+    </a>
+  </nav>
+
+  <!-- Logout -->
+  <div class="px-3 py-4 border-t border-navy-lt">
+    <button id="logoutBtn" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-silver hover:text-red-400 hover:bg-red-500/10 transition-all">
+      <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+      Sign Out
+    </button>
+    <a href="/" target="_blank" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-silver hover:text-white hover:bg-white/5 transition-all mt-0.5">
+      <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>
+      View Website
+    </a>
+  </div>
+</aside>
+
+<!-- ═══════════════ MAIN ═══════════════ -->
+<main class="flex-1 ml-64 flex flex-col min-h-screen">
+
+  <!-- Top bar -->
+  <header class="h-16 bg-navy-mid border-b border-navy-lt flex items-center justify-between px-8 flex-shrink-0 sticky top-0 z-10">
+    <h1 id="pageTitle" class="font-semibold text-base text-white">Overview</h1>
+    <span class="text-silver text-xs" id="dateStamp"></span>
+  </header>
+
+  <!-- Content -->
+  <div class="flex-1 p-8 overflow-y-auto">
+
+    <!-- ─── OVERVIEW ─── -->
+    <div id="sec-overview" class="section active">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+        <div class="bg-navy-mid border border-navy-lt rounded-2xl p-5">
+          <div class="text-silver text-xs font-medium uppercase tracking-widest mb-2">Projects</div>
+          <div class="text-3xl font-bold text-white" id="stat-projects">—</div>
+        </div>
+        <div class="bg-navy-mid border border-navy-lt rounded-2xl p-5">
+          <div class="text-silver text-xs font-medium uppercase tracking-widest mb-2">Services</div>
+          <div class="text-3xl font-bold text-white" id="stat-services">—</div>
+        </div>
+        <div class="bg-navy-mid border border-navy-lt rounded-2xl p-5">
+          <div class="text-silver text-xs font-medium uppercase tracking-widest mb-2">Team Members</div>
+          <div class="text-3xl font-bold text-white" id="stat-team">—</div>
+        </div>
+        <div class="bg-navy-mid border border-navy-lt rounded-2xl p-5">
+          <div class="text-silver text-xs font-medium uppercase tracking-widest mb-2">Testimonials</div>
+          <div class="text-3xl font-bold text-white" id="stat-testimonials">—</div>
+        </div>
+      </div>
+      <div class="bg-navy-mid border border-navy-lt rounded-2xl p-6">
+        <h2 class="font-semibold text-white mb-1">Welcome back 👋</h2>
+        <p class="text-silver text-sm">Use the sidebar to manage your website content. Changes are reflected live on the public site.</p>
+      </div>
+    </div>
+
+    <!-- ─── PROJECTS ─── -->
+    <div id="sec-projects" class="section">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="font-semibold text-lg">Projects</h2>
+        <button onclick="openModal('project')" class="flex items-center gap-2 bg-orange hover:bg-orange-lt text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all hover:-translate-y-0.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Project
+        </button>
+      </div>
+      <div class="bg-navy-mid border border-navy-lt rounded-2xl overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead><tr class="border-b border-navy-lt text-silver text-xs uppercase tracking-widest">
+              <th class="text-left px-5 py-3.5 font-medium">Title</th>
+              <th class="text-left px-5 py-3.5 font-medium">Category</th>
+              <th class="text-left px-5 py-3.5 font-medium">Client</th>
+              <th class="text-left px-5 py-3.5 font-medium">Year</th>
+              <th class="text-left px-5 py-3.5 font-medium">Featured</th>
+              <th class="text-right px-5 py-3.5 font-medium">Actions</th>
+            </tr></thead>
+            <tbody id="projectsBody"><tr><td colspan="6" class="text-center py-10 text-silver text-sm">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── SERVICES ─── -->
+    <div id="sec-services" class="section">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="font-semibold text-lg">Services</h2>
+        <button onclick="openModal('service')" class="flex items-center gap-2 bg-orange hover:bg-orange-lt text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all hover:-translate-y-0.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Service
+        </button>
+      </div>
+      <div class="bg-navy-mid border border-navy-lt rounded-2xl overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead><tr class="border-b border-navy-lt text-silver text-xs uppercase tracking-widest">
+              <th class="text-left px-5 py-3.5 font-medium">Title</th>
+              <th class="text-left px-5 py-3.5 font-medium">Category</th>
+              <th class="text-left px-5 py-3.5 font-medium">Order</th>
+              <th class="text-left px-5 py-3.5 font-medium">Status</th>
+              <th class="text-right px-5 py-3.5 font-medium">Actions</th>
+            </tr></thead>
+            <tbody id="servicesBody"><tr><td colspan="5" class="text-center py-10 text-silver text-sm">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── TEAM ─── -->
+    <div id="sec-team" class="section">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="font-semibold text-lg">Team Members</h2>
+        <button onclick="openModal('team')" class="flex items-center gap-2 bg-orange hover:bg-orange-lt text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all hover:-translate-y-0.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Member
+        </button>
+      </div>
+      <div class="bg-navy-mid border border-navy-lt rounded-2xl overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead><tr class="border-b border-navy-lt text-silver text-xs uppercase tracking-widest">
+              <th class="text-left px-5 py-3.5 font-medium">Name</th>
+              <th class="text-left px-5 py-3.5 font-medium">Role</th>
+              <th class="text-left px-5 py-3.5 font-medium">Order</th>
+              <th class="text-left px-5 py-3.5 font-medium">Status</th>
+              <th class="text-right px-5 py-3.5 font-medium">Actions</th>
+            </tr></thead>
+            <tbody id="teamBody"><tr><td colspan="5" class="text-center py-10 text-silver text-sm">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── TESTIMONIALS ─── -->
+    <div id="sec-testimonials" class="section">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="font-semibold text-lg">Testimonials</h2>
+        <button onclick="openModal('testimonial')" class="flex items-center gap-2 bg-orange hover:bg-orange-lt text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all hover:-translate-y-0.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Testimonial
+        </button>
+      </div>
+      <div class="bg-navy-mid border border-navy-lt rounded-2xl overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead><tr class="border-b border-navy-lt text-silver text-xs uppercase tracking-widest">
+              <th class="text-left px-5 py-3.5 font-medium">Name</th>
+              <th class="text-left px-5 py-3.5 font-medium">Company</th>
+              <th class="text-left px-5 py-3.5 font-medium">Rating</th>
+              <th class="text-left px-5 py-3.5 font-medium">Status</th>
+              <th class="text-right px-5 py-3.5 font-medium">Actions</th>
+            </tr></thead>
+            <tbody id="testimonialsBody"><tr><td colspan="5" class="text-center py-10 text-silver text-sm">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- ═══════════════ MODALS ═══════════════ -->
+
+<!-- Project Modal -->
+<div id="modal-project" class="modal-overlay" onclick="closeModalOnBg(event,'project')">
+  <div class="modal-box bg-navy-mid border border-navy-lt rounded-2xl p-7 w-full max-w-lg mx-4">
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="font-semibold text-lg" id="project-modal-title">Add Project</h3>
+      <button onclick="closeModal('project')" class="text-silver hover:text-white"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <form id="form-project" class="space-y-4">
+      <input type="hidden" id="proj-id" />
+      <div><label>Title *</label><input type="text" id="proj-title" required /></div>
+      <div><label>Category *</label>
+        <select id="proj-category" required>
+          <option value="">Select…</option>
+          <option>Land</option><option>Ocean</option><option>Air</option>
+          <option>Warehousing</option><option>Project Cargo</option><option>Global Logistics</option>
+        </select>
+      </div>
+      <div><label>Description *</label><textarea id="proj-description" rows="3" required></textarea></div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label>Client</label><input type="text" id="proj-client" /></div>
+        <div><label>Location</label><input type="text" id="proj-location" /></div>
+      </div>
+      <div><label>Year</label><input type="number" id="proj-year" min="2000" max="2099" /></div>
+      <div><label>Tags (comma-separated)</label><input type="text" id="proj-tags" placeholder="e.g. cold-chain, Lagos" /></div>
+      <div><label>Image</label><input type="file" id="proj-image" accept="image/*" class="file:bg-navy-lt file:text-white file:border-0 file:rounded-lg file:px-3 file:py-1.5 file:text-xs file:mr-3 file:cursor-pointer cursor-pointer" /></div>
+      <div class="flex items-center gap-2">
+        <input type="checkbox" id="proj-featured" class="w-auto rounded accent-orange" style="width:16px;height:16px;" />
+        <label class="mb-0 normal-case tracking-normal text-sm text-silver" for="proj-featured">Mark as featured</label>
+      </div>
+      <div id="proj-err" class="hidden text-red-400 text-sm bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2"></div>
+      <button type="submit" class="w-full py-3 bg-orange hover:bg-orange-lt text-white font-semibold text-sm rounded-xl transition-all flex items-center justify-center gap-2" id="proj-submit">
+        <span id="proj-btn-text">Save Project</span>
+        <span id="proj-btn-spin" class="hidden"><svg class="w-4 h-4 spin" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg></span>
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- Service Modal -->
+<div id="modal-service" class="modal-overlay" onclick="closeModalOnBg(event,'service')">
+  <div class="modal-box bg-navy-mid border border-navy-lt rounded-2xl p-7 w-full max-w-lg mx-4">
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="font-semibold text-lg" id="service-modal-title">Add Service</h3>
+      <button onclick="closeModal('service')" class="text-silver hover:text-white"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <form id="form-service" class="space-y-4">
+      <input type="hidden" id="svc-id" />
+      <div><label>Title *</label><input type="text" id="svc-title" required /></div>
+      <div><label>Category *</label><input type="text" id="svc-category" required placeholder="e.g. Land Freight" /></div>
+      <div><label>Chip / Badge</label><input type="text" id="svc-chip" placeholder="e.g. New" /></div>
+      <div><label>Description *</label><textarea id="svc-description" rows="3" required></textarea></div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label>Order</label><input type="number" id="svc-order" min="0" value="0" /></div>
+      </div>
+      <div><label>Image</label><input type="file" id="svc-image" accept="image/*" class="file:bg-navy-lt file:text-white file:border-0 file:rounded-lg file:px-3 file:py-1.5 file:text-xs file:mr-3 file:cursor-pointer cursor-pointer" /></div>
+      <div class="flex items-center gap-6">
+        <div class="flex items-center gap-2">
+          <input type="checkbox" id="svc-wide" class="w-auto" style="width:16px;height:16px;" />
+          <label class="mb-0 normal-case tracking-normal text-sm text-silver" for="svc-wide">Wide card</label>
+        </div>
+        <div class="flex items-center gap-2">
+          <input type="checkbox" id="svc-active" class="w-auto" style="width:16px;height:16px;" checked />
+          <label class="mb-0 normal-case tracking-normal text-sm text-silver" for="svc-active">Active</label>
+        </div>
+      </div>
+      <div id="svc-err" class="hidden text-red-400 text-sm bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2"></div>
+      <button type="submit" class="w-full py-3 bg-orange hover:bg-orange-lt text-white font-semibold text-sm rounded-xl transition-all flex items-center justify-center gap-2">
+        <span id="svc-btn-text">Save Service</span>
+        <span id="svc-btn-spin" class="hidden"><svg class="w-4 h-4 spin" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg></span>
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- Team Modal -->
+<div id="modal-team" class="modal-overlay" onclick="closeModalOnBg(event,'team')">
+  <div class="modal-box bg-navy-mid border border-navy-lt rounded-2xl p-7 w-full max-w-lg mx-4">
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="font-semibold text-lg" id="team-modal-title">Add Team Member</h3>
+      <button onclick="closeModal('team')" class="text-silver hover:text-white"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <form id="form-team" class="space-y-4">
+      <input type="hidden" id="tm-id" />
+      <div><label>Full Name *</label><input type="text" id="tm-name" required /></div>
+      <div><label>Role / Title *</label><input type="text" id="tm-role" required /></div>
+      <div><label>Bio *</label><textarea id="tm-bio" rows="3" required></textarea></div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label>Initials (auto)</label><input type="text" id="tm-initials" placeholder="e.g. AE" maxlength="2" /></div>
+        <div><label>Order</label><input type="number" id="tm-order" min="0" value="0" /></div>
+      </div>
+      <div class="flex items-center gap-2">
+        <input type="checkbox" id="tm-active" class="w-auto" style="width:16px;height:16px;" checked />
+        <label class="mb-0 normal-case tracking-normal text-sm text-silver" for="tm-active">Active</label>
+      </div>
+      <div id="tm-err" class="hidden text-red-400 text-sm bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2"></div>
+      <button type="submit" class="w-full py-3 bg-orange hover:bg-orange-lt text-white font-semibold text-sm rounded-xl transition-all flex items-center justify-center gap-2">
+        <span id="tm-btn-text">Save Member</span>
+        <span id="tm-btn-spin" class="hidden"><svg class="w-4 h-4 spin" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg></span>
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- Testimonial Modal -->
+<div id="modal-testimonial" class="modal-overlay" onclick="closeModalOnBg(event,'testimonial')">
+  <div class="modal-box bg-navy-mid border border-navy-lt rounded-2xl p-7 w-full max-w-lg mx-4">
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="font-semibold text-lg" id="testimonial-modal-title">Add Testimonial</h3>
+      <button onclick="closeModal('testimonial')" class="text-silver hover:text-white"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <form id="form-testimonial" class="space-y-4">
+      <input type="hidden" id="tst-id" />
+      <div class="grid grid-cols-2 gap-3">
+        <div><label>Name *</label><input type="text" id="tst-name" required /></div>
+        <div><label>Company *</label><input type="text" id="tst-company" required /></div>
+      </div>
+      <div><label>Role</label><input type="text" id="tst-role" placeholder="e.g. CEO" /></div>
+      <div><label>Testimonial *</label><textarea id="tst-text" rows="3" required></textarea></div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label>Rating (1–5)</label>
+          <select id="tst-rating">
+            <option value="5">5 ★★★★★</option>
+            <option value="4">4 ★★★★</option>
+            <option value="3">3 ★★★</option>
+            <option value="2">2 ★★</option>
+            <option value="1">1 ★</option>
+          </select>
+        </div>
+        <div><label>Order</label><input type="number" id="tst-order" min="0" value="0" /></div>
+      </div>
+      <div class="flex items-center gap-2">
+        <input type="checkbox" id="tst-active" class="w-auto" style="width:16px;height:16px;" checked />
+        <label class="mb-0 normal-case tracking-normal text-sm text-silver" for="tst-active">Active</label>
+      </div>
+      <div id="tst-err" class="hidden text-red-400 text-sm bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2"></div>
+      <button type="submit" class="w-full py-3 bg-orange hover:bg-orange-lt text-white font-semibold text-sm rounded-xl transition-all flex items-center justify-center gap-2">
+        <span id="tst-btn-text">Save Testimonial</span>
+        <span id="tst-btn-spin" class="hidden"><svg class="w-4 h-4 spin" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg></span>
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- Confirm Delete Modal -->
+<div id="modal-confirm" class="modal-overlay" onclick="closeModalOnBg(event,'confirm')">
+  <div class="modal-box bg-navy-mid border border-navy-lt rounded-2xl p-7 w-full max-w-sm mx-4 text-center">
+    <div class="w-12 h-12 bg-red-500/15 rounded-full flex items-center justify-center mx-auto mb-4">
+      <svg class="w-6 h-6 text-red-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+    </div>
+    <h3 class="font-semibold text-white mb-1">Delete item?</h3>
+    <p class="text-silver text-sm mb-6">This action cannot be undone.</p>
+    <div class="flex gap-3">
+      <button onclick="closeModal('confirm')" class="flex-1 py-2.5 rounded-xl border border-navy-lt text-silver hover:text-white hover:border-silver transition-all text-sm">Cancel</button>
+      <button id="confirmDeleteBtn" class="flex-1 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white font-medium text-sm transition-all">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="toast bg-navy-mid border border-navy-lt rounded-xl px-4 py-3 flex items-center gap-3 text-sm shadow-xl">
+  <span id="toast-icon">✓</span>
+  <span id="toast-msg">Done</span>
+</div>
+
+<script>
+// ─── AUTH GUARD ───
+const token = localStorage.getItem('ngj_token');
+if (!token) window.location.replace('/admin');
+
+const adminData = JSON.parse(localStorage.getItem('ngj_admin') || '{}');
+if (adminData.name) {
+  document.getElementById('adminName').textContent = adminData.name;
+  document.getElementById('adminInitial').textContent = adminData.name.charAt(0).toUpperCase();
+}
+if (adminData.email) document.getElementById('adminEmail').textContent = adminData.email;
+
+document.getElementById('dateStamp').textContent = new Date().toLocaleDateString('en-GB', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+// ─── API HELPER ───
+async function api(method, url, body = null, isFormData = false) {
+  const opts = {
+    method,
+    headers: { Authorization: 'Bearer ' + token },
+  };
+  if (body) {
+    if (isFormData) {
+      opts.body = body;
+    } else {
+      opts.headers['Content-Type'] = 'application/json';
+      opts.body = JSON.stringify(body);
+    }
+  }
+  const res = await fetch(url, opts);
+  if (res.status === 401) { logout(); return null; }
+  return res;
+}
+
+// ─── SIDEBAR NAV ───
+const sideLinks = document.querySelectorAll('.sidebar-link');
+const sections  = document.querySelectorAll('.section');
+const pageTitle = document.getElementById('pageTitle');
+const titles    = { overview:'Overview', projects:'Projects', services:'Services', team:'Team Members', testimonials:'Testimonials' };
+
+sideLinks.forEach(link => {
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    const s = link.dataset.section;
+    sideLinks.forEach(l => { l.classList.remove('active'); l.classList.add('text-silver'); l.classList.remove('text-white'); });
+    link.classList.add('active'); link.classList.remove('text-silver'); link.classList.add('text-white');
+    sections.forEach(sec => sec.classList.remove('active'));
+    document.getElementById('sec-' + s).classList.add('active');
+    pageTitle.textContent = titles[s];
+    if (s !== 'overview') loadSection(s);
+  });
+});
+
+// ─── TOAST ───
+let toastTimer;
+function showToast(msg, type = 'success') {
+  const t   = document.getElementById('toast');
+  const ico = document.getElementById('toast-icon');
+  const m   = document.getElementById('toast-msg');
+  ico.textContent = type === 'success' ? '✓' : '✕';
+  ico.style.color = type === 'success' ? '#4ade80' : '#f87171';
+  m.textContent   = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ─── MODAL HELPERS ───
+function openModal(name) {
+  document.getElementById('modal-' + name).classList.add('open');
+}
+function closeModal(name) {
+  document.getElementById('modal-' + name).classList.remove('open');
+}
+function closeModalOnBg(e, name) {
+  if (e.target === document.getElementById('modal-' + name)) closeModal(name);
+}
+
+// ─── LOADING STATE ───
+function setBtnLoading(prefix, loading) {
+  const btn  = document.getElementById(prefix + '-btn-text') || document.getElementById(prefix + 'btn-text');
+  const spin = document.getElementById(prefix + '-btn-spin') || document.getElementById(prefix + 'btn-spin');
+  if (!btn || !spin) return;
+  btn.closest('button').disabled = loading;
+  btn.classList.toggle('hidden', loading);
+  spin.classList.toggle('hidden', !loading);
+}
+
+// ═══════════════════════════════════════
+// OVERVIEW STATS
+// ═══════════════════════════════════════
+async function loadStats() {
+  try {
+    const [pR, srR, tmR, tstR] = await Promise.all([
+      api('GET', '/api/projects'),
+      api('GET', '/api/services/all'),
+      api('GET', '/api/team/all'),
+      api('GET', '/api/testimonials/all'),
+    ]);
+    if (!pR || !srR || !tmR || !tstR) return;
+    const [p, sr, tm, tst] = await Promise.all([pR.json(), srR.json(), tmR.json(), tstR.json()]);
+    document.getElementById('stat-projects').textContent     = Array.isArray(p)   ? p.length   : '—';
+    document.getElementById('stat-services').textContent     = Array.isArray(sr)  ? sr.length  : '—';
+    document.getElementById('stat-team').textContent         = Array.isArray(tm)  ? tm.length  : '—';
+    document.getElementById('stat-testimonials').textContent = Array.isArray(tst) ? tst.length : '—';
+  } catch {}
+}
+loadStats();
+
+// ═══════════════════════════════════════
+// SECTION LOADER ROUTER
+// ═══════════════════════════════════════
+function loadSection(s) {
+  if (s === 'projects')     loadProjects();
+  if (s === 'services')     loadServices();
+  if (s === 'team')         loadTeam();
+  if (s === 'testimonials') loadTestimonials();
+}
+
+// ═══════════════════════════════════════
+// PROJECTS
+// ═══════════════════════════════════════
+async function loadProjects() {
+  const tbody = document.getElementById('projectsBody');
+  tbody.innerHTML = '<tr><td colspan="6" class="text-center py-10 text-silver text-sm">Loading…</td></tr>';
+  const res  = await api('GET', '/api/projects');
+  if (!res) return;
+  const data = await res.json();
+  if (!data.length) { tbody.innerHTML = '<tr><td colspan="6" class="text-center py-10 text-silver text-sm">No projects yet.</td></tr>'; return; }
+  tbody.innerHTML = data.map(p => `
+    <tr class="border-b border-navy-lt/50">
+      <td class="px-5 py-3.5 font-medium">${esc(p.title)}</td>
+      <td class="px-5 py-3.5 text-silver">${esc(p.category)}</td>
+      <td class="px-5 py-3.5 text-silver">${esc(p.client || '—')}</td>
+      <td class="px-5 py-3.5 text-silver">${p.year || '—'}</td>
+      <td class="px-5 py-3.5">${p.featured ? '<span class="badge-featured">Featured</span>' : '<span class="text-silver text-xs">—</span>'}</td>
+      <td class="px-5 py-3.5 text-right">
+        <button onclick="editProject('${p._id}')" class="text-silver hover:text-white text-xs px-3 py-1.5 rounded-lg border border-navy-lt hover:border-silver transition-all mr-2">Edit</button>
+        <button onclick="confirmDelete('project','${p._id}')" class="text-red-400 hover:text-red-300 text-xs px-3 py-1.5 rounded-lg border border-red-500/20 hover:border-red-400/50 transition-all">Delete</button>
+      </td>
+    </tr>`).join('');
+}
+
+function openProjectModal(edit = false) {
+  document.getElementById('project-modal-title').textContent = edit ? 'Edit Project' : 'Add Project';
+  openModal('project');
+}
+function resetProjectForm() {
+  ['proj-id','proj-title','proj-category','proj-description','proj-client','proj-location','proj-year','proj-tags'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('proj-featured').checked = false;
+  document.getElementById('proj-err').classList.add('hidden');
+}
+
+async function editProject(id) {
+  const res  = await api('GET', '/api/projects/' + id);
+  const p    = await res.json();
+  resetProjectForm();
+  document.getElementById('proj-id').value          = p._id;
+  document.getElementById('proj-title').value       = p.title;
+  document.getElementById('proj-category').value    = p.category;
+  document.getElementById('proj-description').value = p.description;
+  document.getElementById('proj-client').value      = p.client || '';
+  document.getElementById('proj-location').value    = p.location || '';
+  document.getElementById('proj-year').value        = p.year || '';
+  document.getElementById('proj-tags').value        = (p.tags || []).join(', ');
+  document.getElementById('proj-featured').checked  = p.featured;
+  openProjectModal(true);
+}
+
+document.getElementById('form-project').addEventListener('submit', async e => {
+  e.preventDefault();
+  const errEl = document.getElementById('proj-err');
+  errEl.classList.add('hidden');
+  setBtnLoading('proj', true);
+
+  const id   = document.getElementById('proj-id').value;
+  const fd   = new FormData();
+  fd.append('title',       document.getElementById('proj-title').value.trim());
+  fd.append('category',    document.getElementById('proj-category').value);
+  fd.append('description', document.getElementById('proj-description').value.trim());
+  fd.append('client',      document.getElementById('proj-client').value.trim());
+  fd.append('location',    document.getElementById('proj-location').value.trim());
+  fd.append('year',        document.getElementById('proj-year').value);
+  fd.append('tags',        document.getElementById('proj-tags').value);
+  fd.append('featured',    document.getElementById('proj-featured').checked);
+  const imgFile = document.getElementById('proj-image').files[0];
+  if (imgFile) fd.append('image', imgFile);
+
+  const res = await api(id ? 'PUT' : 'POST', '/api/projects' + (id ? '/' + id : ''), fd, true);
+  setBtnLoading('proj', false);
+  if (!res) return;
+  if (!res.ok) {
+    const d = await res.json();
+    errEl.textContent = d.error || 'Failed to save.'; errEl.classList.remove('hidden'); return;
+  }
+  closeModal('project');
+  resetProjectForm();
+  loadProjects();
+  loadStats();
+  showToast(id ? 'Project updated!' : 'Project added!');
+});
+
+// ═══════════════════════════════════════
+// SERVICES
+// ═══════════════════════════════════════
+async function loadServices() {
+  const tbody = document.getElementById('servicesBody');
+  tbody.innerHTML = '<tr><td colspan="5" class="text-center py-10 text-silver text-sm">Loading…</td></tr>';
+  const res  = await api('GET', '/api/services/all');
+  if (!res) return;
+  const data = await res.json();
+  if (!data.length) { tbody.innerHTML = '<tr><td colspan="5" class="text-center py-10 text-silver text-sm">No services yet.</td></tr>'; return; }
+  tbody.innerHTML = data.map(s => `
+    <tr class="border-b border-navy-lt/50">
+      <td class="px-5 py-3.5 font-medium">${esc(s.title)}</td>
+      <td class="px-5 py-3.5 text-silver">${esc(s.category)}</td>
+      <td class="px-5 py-3.5 text-silver">${s.order}</td>
+      <td class="px-5 py-3.5">${s.active ? '<span class="badge-active">Active</span>' : '<span class="badge-inactive">Hidden</span>'}</td>
+      <td class="px-5 py-3.5 text-right">
+        <button onclick="editService('${s._id}')" class="text-silver hover:text-white text-xs px-3 py-1.5 rounded-lg border border-navy-lt hover:border-silver transition-all mr-2">Edit</button>
+        <button onclick="confirmDelete('service','${s._id}')" class="text-red-400 hover:text-red-300 text-xs px-3 py-1.5 rounded-lg border border-red-500/20 hover:border-red-400/50 transition-all">Delete</button>
+      </td>
+    </tr>`).join('');
+}
+
+function resetServiceForm() {
+  ['svc-id','svc-title','svc-category','svc-chip','svc-description','svc-order'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  document.getElementById('svc-order').value  = '0';
+  document.getElementById('svc-wide').checked   = false;
+  document.getElementById('svc-active').checked = true;
+  document.getElementById('svc-err').classList.add('hidden');
+}
+
+async function editService(id) {
+  const res = await api('GET', '/api/services/all');
+  const all = await res.json();
+  const s   = all.find(x => x._id === id);
+  if (!s) return;
+  resetServiceForm();
+  document.getElementById('svc-id').value          = s._id;
+  document.getElementById('svc-title').value       = s.title;
+  document.getElementById('svc-category').value    = s.category;
+  document.getElementById('svc-chip').value        = s.chip || '';
+  document.getElementById('svc-description').value = s.description;
+  document.getElementById('svc-order').value       = s.order;
+  document.getElementById('svc-wide').checked      = s.wide;
+  document.getElementById('svc-active').checked    = s.active;
+  document.getElementById('service-modal-title').textContent = 'Edit Service';
+  openModal('service');
+}
+
+document.getElementById('modal-service').querySelector('button[onclick*="Add"]') // fix title on open
+document.querySelector('[onclick="openModal(\'service\')"]')?.addEventListener('click', () => {
+  resetServiceForm();
+  document.getElementById('service-modal-title').textContent = 'Add Service';
+});
+
+document.getElementById('form-service').addEventListener('submit', async e => {
+  e.preventDefault();
+  const errEl = document.getElementById('svc-err');
+  errEl.classList.add('hidden');
+  setBtnLoading('svc', true);
+
+  const id = document.getElementById('svc-id').value;
+  const fd = new FormData();
+  fd.append('title',       document.getElementById('svc-title').value.trim());
+  fd.append('category',    document.getElementById('svc-category').value.trim());
+  fd.append('chip',        document.getElementById('svc-chip').value.trim());
+  fd.append('description', document.getElementById('svc-description').value.trim());
+  fd.append('order',       document.getElementById('svc-order').value);
+  fd.append('wide',        document.getElementById('svc-wide').checked);
+  fd.append('active',      document.getElementById('svc-active').checked);
+  const imgFile = document.getElementById('svc-image').files[0];
+  if (imgFile) fd.append('image', imgFile);
+
+  const res = await api(id ? 'PUT' : 'POST', '/api/services' + (id ? '/' + id : ''), fd, true);
+  setBtnLoading('svc', false);
+  if (!res) return;
+  if (!res.ok) {
+    const d = await res.json();
+    errEl.textContent = d.error || 'Failed to save.'; errEl.classList.remove('hidden'); return;
+  }
+  closeModal('service'); resetServiceForm(); loadServices(); loadStats();
+  showToast(id ? 'Service updated!' : 'Service added!');
+});
+
+// ═══════════════════════════════════════
+// TEAM
+// ═══════════════════════════════════════
+async function loadTeam() {
+  const tbody = document.getElementById('teamBody');
+  tbody.innerHTML = '<tr><td colspan="5" class="text-center py-10 text-silver text-sm">Loading…</td></tr>';
+  const res  = await api('GET', '/api/team/all');
+  if (!res) return;
+  const data = await res.json();
+  if (!data.length) { tbody.innerHTML = '<tr><td colspan="5" class="text-center py-10 text-silver text-sm">No team members yet.</td></tr>'; return; }
+  tbody.innerHTML = data.map(m => `
+    <tr class="border-b border-navy-lt/50">
+      <td class="px-5 py-3.5">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold text-white flex-shrink-0" style="background:${esc(m.gradient || 'linear-gradient(135deg,#1A2E4A,#233A5C)')}">${esc(m.initials || '?')}</div>
+          <span class="font-medium">${esc(m.name)}</span>
+        </div>
+      </td>
+      <td class="px-5 py-3.5 text-silver">${esc(m.role)}</td>
+      <td class="px-5 py-3.5 text-silver">${m.order}</td>
+      <td class="px-5 py-3.5">${m.active ? '<span class="badge-active">Active</span>' : '<span class="badge-inactive">Hidden</span>'}</td>
+      <td class="px-5 py-3.5 text-right">
+        <button onclick="editTeam('${m._id}')" class="text-silver hover:text-white text-xs px-3 py-1.5 rounded-lg border border-navy-lt hover:border-silver transition-all mr-2">Edit</button>
+        <button onclick="confirmDelete('team','${m._id}')" class="text-red-400 hover:text-red-300 text-xs px-3 py-1.5 rounded-lg border border-red-500/20 hover:border-red-400/50 transition-all">Delete</button>
+      </td>
+    </tr>`).join('');
+}
+
+function resetTeamForm() {
+  ['tm-id','tm-name','tm-role','tm-bio','tm-initials','tm-order'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  document.getElementById('tm-order').value  = '0';
+  document.getElementById('tm-active').checked = true;
+  document.getElementById('tm-err').classList.add('hidden');
+}
+
+async function editTeam(id) {
+  const res  = await api('GET', '/api/team/all');
+  const all  = await res.json();
+  const m    = all.find(x => x._id === id);
+  if (!m) return;
+  resetTeamForm();
+  document.getElementById('tm-id').value       = m._id;
+  document.getElementById('tm-name').value     = m.name;
+  document.getElementById('tm-role').value     = m.role;
+  document.getElementById('tm-bio').value      = m.bio;
+  document.getElementById('tm-initials').value = m.initials || '';
+  document.getElementById('tm-order').value    = m.order;
+  document.getElementById('tm-active').checked = m.active;
+  document.getElementById('team-modal-title').textContent = 'Edit Team Member';
+  openModal('team');
+}
+
+document.getElementById('form-team').addEventListener('submit', async e => {
+  e.preventDefault();
+  const errEl = document.getElementById('tm-err');
+  errEl.classList.add('hidden');
+  setBtnLoading('tm', true);
+
+  const id   = document.getElementById('tm-id').value;
+  const body = {
+    name:     document.getElementById('tm-name').value.trim(),
+    role:     document.getElementById('tm-role').value.trim(),
+    bio:      document.getElementById('tm-bio').value.trim(),
+    initials: document.getElementById('tm-initials').value.trim(),
+    order:    parseInt(document.getElementById('tm-order').value) || 0,
+    active:   document.getElementById('tm-active').checked,
+  };
+
+  const res = await api(id ? 'PUT' : 'POST', '/api/team' + (id ? '/' + id : ''), body);
+  setBtnLoading('tm', false);
+  if (!res) return;
+  if (!res.ok) {
+    const d = await res.json();
+    errEl.textContent = d.error || 'Failed to save.'; errEl.classList.remove('hidden'); return;
+  }
+  closeModal('team'); resetTeamForm(); loadTeam(); loadStats();
+  showToast(id ? 'Member updated!' : 'Member added!');
+});
+
+// ═══════════════════════════════════════
+// TESTIMONIALS
+// ═══════════════════════════════════════
+async function loadTestimonials() {
+  const tbody = document.getElementById('testimonialsBody');
+  tbody.innerHTML = '<tr><td colspan="5" class="text-center py-10 text-silver text-sm">Loading…</td></tr>';
+  const res  = await api('GET', '/api/testimonials/all');
+  if (!res) return;
+  const data = await res.json();
+  if (!data.length) { tbody.innerHTML = '<tr><td colspan="5" class="text-center py-10 text-silver text-sm">No testimonials yet.</td></tr>'; return; }
+  tbody.innerHTML = data.map(t => `
+    <tr class="border-b border-navy-lt/50">
+      <td class="px-5 py-3.5 font-medium">${esc(t.name)}</td>
+      <td class="px-5 py-3.5 text-silver">${esc(t.company)}</td>
+      <td class="px-5 py-3.5 text-yellow-400 text-sm">${'★'.repeat(t.rating || 5)}</td>
+      <td class="px-5 py-3.5">${t.active ? '<span class="badge-active">Active</span>' : '<span class="badge-inactive">Hidden</span>'}</td>
+      <td class="px-5 py-3.5 text-right">
+        <button onclick="editTestimonial('${t._id}')" class="text-silver hover:text-white text-xs px-3 py-1.5 rounded-lg border border-navy-lt hover:border-silver transition-all mr-2">Edit</button>
+        <button onclick="confirmDelete('testimonial','${t._id}')" class="text-red-400 hover:text-red-300 text-xs px-3 py-1.5 rounded-lg border border-red-500/20 hover:border-red-400/50 transition-all">Delete</button>
+      </td>
+    </tr>`).join('');
+}
+
+function resetTestimonialForm() {
+  ['tst-id','tst-name','tst-company','tst-role','tst-text','tst-order'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  document.getElementById('tst-rating').value = '5';
+  document.getElementById('tst-order').value  = '0';
+  document.getElementById('tst-active').checked = true;
+  document.getElementById('tst-err').classList.add('hidden');
+}
+
+async function editTestimonial(id) {
+  const res  = await api('GET', '/api/testimonials/all');
+  const all  = await res.json();
+  const t    = all.find(x => x._id === id);
+  if (!t) return;
+  resetTestimonialForm();
+  document.getElementById('tst-id').value      = t._id;
+  document.getElementById('tst-name').value    = t.name;
+  document.getElementById('tst-company').value = t.company;
+  document.getElementById('tst-role').value    = t.role || '';
+  document.getElementById('tst-text').value    = t.text;
+  document.getElementById('tst-rating').value  = t.rating || 5;
+  document.getElementById('tst-order').value   = t.order || 0;
+  document.getElementById('tst-active').checked = t.active;
+  document.getElementById('testimonial-modal-title').textContent = 'Edit Testimonial';
+  openModal('testimonial');
+}
+
+document.getElementById('form-testimonial').addEventListener('submit', async e => {
+  e.preventDefault();
+  const errEl = document.getElementById('tst-err');
+  errEl.classList.add('hidden');
+  setBtnLoading('tst', true);
+
+  const id   = document.getElementById('tst-id').value;
+  const body = {
+    name:    document.getElementById('tst-name').value.trim(),
+    company: document.getElementById('tst-company').value.trim(),
+    role:    document.getElementById('tst-role').value.trim(),
+    text:    document.getElementById('tst-text').value.trim(),
+    rating:  parseInt(document.getElementById('tst-rating').value),
+    order:   parseInt(document.getElementById('tst-order').value) || 0,
+    active:  document.getElementById('tst-active').checked,
+  };
+
+  const res = await api(id ? 'PUT' : 'POST', '/api/testimonials' + (id ? '/' + id : ''), body);
+  setBtnLoading('tst', false);
+  if (!res) return;
+  if (!res.ok) {
+    const d = await res.json();
+    errEl.textContent = d.error || 'Failed to save.'; errEl.classList.remove('hidden'); return;
+  }
+  closeModal('testimonial'); resetTestimonialForm(); loadTestimonials(); loadStats();
+  showToast(id ? 'Testimonial updated!' : 'Testimonial added!');
+});
+
+// ═══════════════════════════════════════
+// DELETE
+// ═══════════════════════════════════════
+let _deleteTarget = null;
+function confirmDelete(type, id) {
+  _deleteTarget = { type, id };
+  openModal('confirm');
+}
+
+const endpointMap = { project:'projects', service:'services', team:'team', testimonial:'testimonials' };
+const reloaderMap = { project:loadProjects, service:loadServices, team:loadTeam, testimonial:loadTestimonials };
+
+document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+  if (!_deleteTarget) return;
+  const { type, id } = _deleteTarget;
+  const res = await api('DELETE', '/api/' + endpointMap[type] + '/' + id);
+  closeModal('confirm');
+  _deleteTarget = null;
+  if (res && res.ok) {
+    reloaderMap[type]();
+    loadStats();
+    showToast('Deleted successfully.');
+  } else {
+    showToast('Delete failed.', 'error');
+  }
+});
+
+// ─── Fix "Add" buttons to reset forms ───
+document.querySelector('[onclick="openModal(\'project\')"]')?.addEventListener('click', () => {
+  resetProjectForm();
+  document.getElementById('project-modal-title').textContent = 'Add Project';
+});
+document.querySelector('[onclick="openModal(\'team\')"]')?.addEventListener('click', () => {
+  resetTeamForm();
+  document.getElementById('team-modal-title').textContent = 'Add Team Member';
+});
+document.querySelector('[onclick="openModal(\'testimonial\')"]')?.addEventListener('click', () => {
+  resetTestimonialForm();
+  document.getElementById('testimonial-modal-title').textContent = 'Add Testimonial';
+});
+document.querySelector('[onclick="openModal(\'service\')"]')?.addEventListener('click', () => {
+  resetServiceForm();
+  document.getElementById('service-modal-title').textContent = 'Add Service';
+});
+
+// ─── LOGOUT ───
+function logout() {
+  localStorage.removeItem('ngj_token');
+  localStorage.removeItem('ngj_admin');
+  window.location.replace('/admin');
+}
+document.getElementById('logoutBtn').addEventListener('click', logout);
+
+// ─── XSS ESCAPE ───
+function esc(s) {
+  if (s == null) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>

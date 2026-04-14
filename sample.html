@@ -1,0 +1,3534 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NG & J Swift Haulage & Logistics Limited</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Sora:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap"
+        rel="stylesheet">
+    <style>
+        /* ═══════════════════════════════════════
+   DESIGN TOKENS
+═══════════════════════════════════════ */
+        :root {
+            --orange: #E8520A;
+            --orange-lt: #FF6B2B;
+            --orange-pale: #FFF0EA;
+            --orange-mid: rgba(232, 82, 10, 0.12);
+            --navy: #0F1E33;
+            --navy-mid: #1A2E4A;
+            --navy-lt: #233A5C;
+            --slate: #4A5568;
+            --silver: #8EA0B4;
+            --mist: #F4F1EC;
+            --rule: #E2D9CF;
+            --white: #FFFFFF;
+            --sh: 0 4px 24px rgba(15, 30, 51, 0.08);
+            --sh-lg: 0 20px 60px rgba(15, 30, 51, 0.14);
+            --sh-xl: 0 32px 80px rgba(15, 30, 51, 0.20);
+            --radius: 10px;
+            --radius-lg: 16px;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+
+        body {
+            font-family: 'Sora', sans-serif;
+            background: var(--white);
+            color: var(--navy);
+            overflow-x: hidden;
+            cursor: default;
+        }
+
+        /* ── LOADER ── */
+        #loader {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: var(--navy);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 28px;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+        }
+
+        #loader.done {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loader-logo {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 48px;
+            letter-spacing: 4px;
+            color: white;
+        }
+
+        .loader-logo span {
+            color: var(--orange);
+        }
+
+        .loader-bar-wrap {
+            width: 200px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 99px;
+            overflow: hidden;
+        }
+
+        .loader-bar {
+            height: 100%;
+            background: var(--orange);
+            border-radius: 99px;
+            width: 0;
+            animation: loadBar 1.6s ease forwards;
+        }
+
+        @keyframes loadBar {
+            to {
+                width: 100%;
+            }
+        }
+
+        .loader-text {
+            font-size: 11px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.35);
+        }
+
+        /* ── SCROLL PROGRESS ── */
+        #sbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--orange);
+            z-index: 200;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.1s linear;
+        }
+
+        /* ── CUSTOM CURSOR ── */
+        .cursor {
+            position: fixed;
+            pointer-events: none;
+            z-index: 999;
+            width: 10px;
+            height: 10px;
+            background: var(--orange);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: transform 0.08s, width 0.2s, height 0.2s, opacity 0.2s;
+            mix-blend-mode: multiply;
+        }
+
+        .cursor-ring {
+            position: fixed;
+            pointer-events: none;
+            z-index: 998;
+            width: 36px;
+            height: 36px;
+            border: 1.5px solid var(--orange);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: transform 0.18s, width 0.2s, height 0.2s, opacity 0.2s;
+            opacity: 0.5;
+        }
+
+        body:hover .cursor {
+            opacity: 1;
+        }
+
+        /* ── NAVBAR ── */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 500;
+            height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 5vw;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(20px) saturate(160%);
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        nav.scrolled {
+            border-color: var(--rule);
+            box-shadow: var(--sh);
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-emblem {
+            position: relative;
+            width: 44px;
+            height: 44px;
+        }
+
+        .logo-emblem svg {
+            width: 44px;
+            height: 44px;
+        }
+
+        .logo-wordmark {
+            line-height: 1.1;
+        }
+
+        .logo-nm {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 21px;
+            letter-spacing: 1.5px;
+            color: var(--navy);
+        }
+
+        .logo-tag {
+            font-size: 8.5px;
+            font-weight: 600;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+            color: var(--silver);
+        }
+
+        .nav-center {
+            display: flex;
+            gap: 0;
+            list-style: none;
+        }
+
+        .nav-center a {
+            display: block;
+            padding: 8px 18px;
+            font-size: 12.5px;
+            font-weight: 600;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+            color: var(--slate);
+            text-decoration: none;
+            border-radius: 6px;
+            transition: color 0.2s, background 0.2s;
+            position: relative;
+        }
+
+        .nav-center a::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            left: 18px;
+            right: 18px;
+            height: 2px;
+            background: var(--orange);
+            border-radius: 1px;
+            transform: scaleX(0);
+            transition: transform 0.22s;
+        }
+
+        .nav-center a:hover {
+            color: var(--navy);
+        }
+
+        .nav-center a:hover::after {
+            transform: scaleX(1);
+        }
+
+        .nav-right {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .btn-quote {
+            background: var(--orange);
+            color: white;
+            padding: 10px 22px;
+            border-radius: var(--radius);
+            font-size: 12.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            box-shadow: 0 6px 20px rgba(232, 82, 10, 0.32);
+            transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+        }
+
+        .btn-quote:hover {
+            background: var(--orange-lt);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 28px rgba(232, 82, 10, 0.42);
+        }
+
+        /* mobile nav toggle */
+        .nav-burger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 6px;
+        }
+
+        .nav-burger span {
+            display: block;
+            width: 22px;
+            height: 2px;
+            background: var(--navy);
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+
+        .nav-burger.open span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .nav-burger.open span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .nav-burger.open span:nth-child(3) {
+            transform: rotate(-45deg) translate(5px, -5px);
+        }
+
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 72px;
+            left: 0;
+            right: 0;
+            z-index: 499;
+            background: white;
+            border-bottom: 1px solid var(--rule);
+            padding: 20px 5vw 28px;
+            box-shadow: var(--sh-lg);
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .mobile-menu.open {
+            display: flex;
+        }
+
+        .mobile-menu a {
+            display: block;
+            padding: 12px 14px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--slate);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background 0.15s, color 0.15s;
+        }
+
+        .mobile-menu a:hover {
+            background: var(--mist);
+            color: var(--navy);
+        }
+
+        .mobile-menu .mm-cta {
+            background: var(--orange);
+            color: white;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        /* ── FLOATING QUOTE BUTTON ── */
+        .float-cta {
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            z-index: 400;
+            background: var(--orange);
+            color: white;
+            border-radius: 50px;
+            padding: 14px 24px;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 12px 36px rgba(232, 82, 10, 0.45);
+            transform: translateY(80px);
+            opacity: 0;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+                opacity 0.4s ease,
+                background 0.2s,
+                box-shadow 0.2s;
+        }
+
+        .float-cta.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .float-cta:hover {
+            background: var(--orange-lt);
+            box-shadow: 0 16px 48px rgba(232, 82, 10, 0.55);
+        }
+
+        .float-icon {
+            font-size: 16px;
+            animation: truckMove 2s ease-in-out infinite;
+        }
+
+        @keyframes truckMove {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            50% {
+                transform: translateX(4px);
+            }
+        }
+
+        /* ── SECTION COMMONS ── */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: none;
+        }
+
+        .d1 {
+            transition-delay: 0.08s;
+        }
+
+        .d2 {
+            transition-delay: 0.16s;
+        }
+
+        .d3 {
+            transition-delay: 0.24s;
+        }
+
+        .d4 {
+            transition-delay: 0.32s;
+        }
+
+        .d5 {
+            transition-delay: 0.40s;
+        }
+
+        .d6 {
+            transition-delay: 0.48s;
+        }
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            background: var(--orange-pale);
+            border: 1px solid rgba(232, 82, 10, 0.18);
+            border-radius: 99px;
+            padding: 5px 14px;
+            font-size: 10.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.8px;
+            color: var(--orange);
+        }
+
+        .tag-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--orange);
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        h2.big {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(44px, 5.5vw, 76px);
+            line-height: 0.93;
+            letter-spacing: 0.5px;
+            color: var(--navy);
+        }
+
+        h2.big .o {
+            color: var(--orange);
+        }
+
+        h2.big .i {
+            font-family: 'DM Serif Display', serif;
+            font-style: italic;
+            color: var(--orange);
+        }
+
+        .body-txt {
+            font-size: 15.5px;
+            line-height: 1.82;
+            color: var(--slate);
+            font-weight: 300;
+        }
+
+        .rule-accent {
+            width: 36px;
+            height: 3px;
+            background: var(--orange);
+            border-radius: 2px;
+        }
+
+        /* ═══════════════════════════════════
+   HERO
+═══════════════════════════════════ */
+        #hero {
+            min-height: 100vh;
+            background: var(--mist);
+            position: relative;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            padding-top: 72px;
+        }
+
+        /* animated road-line background */
+        .road-lines {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .road-lines::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(-60deg,
+                    transparent, transparent 80px,
+                    rgba(232, 82, 10, 0.025) 80px, rgba(232, 82, 10, 0.025) 81px);
+        }
+
+        .road-lines::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(ellipse at 20% 50%, rgba(232, 82, 10, 0.05) 0%, transparent 55%);
+        }
+
+        .hero-l {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 80px 5vw 80px 8vw;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-l .tag {
+            margin-bottom: 32px;
+            align-self: flex-start;
+        }
+
+        .hero-l h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(72px, 9vw, 120px);
+            line-height: 0.88;
+            color: var(--navy);
+            margin-bottom: 10px;
+        }
+
+        .hero-l h1 .accent-o {
+            color: var(--orange);
+        }
+
+        .hero-l h1 .accent-i {
+            font-family: 'DM Serif Display', serif;
+            font-style: italic;
+        }
+
+        .hero-tagline {
+            font-size: 17px;
+            line-height: 1.72;
+            color: var(--slate);
+            font-weight: 300;
+            max-width: 430px;
+            margin: 28px 0 44px;
+        }
+
+        .hero-btns {
+            display: flex;
+            gap: 14px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: var(--orange);
+            color: white;
+            padding: 15px 34px;
+            border-radius: var(--radius);
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.9px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            box-shadow: 0 8px 26px rgba(232, 82, 10, 0.34);
+            transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+        }
+
+        .btn-primary:hover {
+            background: var(--orange-lt);
+            transform: translateY(-2px);
+            box-shadow: 0 14px 36px rgba(232, 82, 10, 0.44);
+        }
+
+        .btn-outline {
+            color: var(--navy);
+            border: 1.5px solid var(--rule);
+            background: white;
+            padding: 14px 28px;
+            border-radius: var(--radius);
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.9px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: border-color 0.2s, color 0.2s, transform 0.15s;
+        }
+
+        .btn-outline:hover {
+            border-color: var(--orange);
+            color: var(--orange);
+            transform: translateY(-1px);
+        }
+
+        .hero-kpis {
+            margin-top: 60px;
+            padding-top: 44px;
+            border-top: 1px solid var(--rule);
+            display: flex;
+            gap: 44px;
+            flex-wrap: wrap;
+        }
+
+        .kpi-num {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 48px;
+            line-height: 1;
+            color: var(--navy);
+        }
+
+        .kpi-num span {
+            color: var(--orange);
+        }
+
+        .kpi-lbl {
+            font-size: 10.5px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--silver);
+            margin-top: 5px;
+        }
+
+        /* hero right — stacked image collage */
+        .hero-r {
+            position: relative;
+            overflow: hidden;
+            clip-path: polygon(6% 0%, 100% 0%, 100% 100%, 0% 100%);
+        }
+
+        .hero-img-bg {
+            position: absolute;
+            inset: 0;
+            background: url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=1000&q=80') center/cover no-repeat;
+        }
+
+        .hero-img-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(120deg, rgba(15, 30, 51, 0.40) 0%, transparent 55%);
+        }
+
+        /* floating cards on hero */
+        .hero-card {
+            position: absolute;
+            z-index: 5;
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 18px 22px;
+            box-shadow: var(--sh-xl);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .hero-card.c1 {
+            bottom: 100px;
+            left: -16px;
+            animation: hfloat 4s ease-in-out infinite;
+        }
+
+        .hero-card.c2 {
+            top: 140px;
+            left: -8px;
+            animation: hfloat 4s 1.5s ease-in-out infinite;
+        }
+
+        @keyframes hfloat {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .hc-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .hc-icon.o {
+            background: var(--orange-pale);
+        }
+
+        .hc-icon.b {
+            background: rgba(15, 30, 51, 0.07);
+        }
+
+        .hc-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 26px;
+            line-height: 1;
+            color: var(--navy);
+        }
+
+        .hc-sub {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: var(--silver);
+            margin-top: 3px;
+        }
+
+        .hero-stamp {
+            position: absolute;
+            top: 50%;
+            right: 5%;
+            transform: translateY(-50%);
+            width: 100px;
+            height: 100px;
+            z-index: 5;
+        }
+
+        .hero-stamp svg {
+            width: 100%;
+            height: 100%;
+            animation: spin 18s linear infinite;
+        }
+
+        /* ── MARQUEE ── */
+        .marquee-band {
+            background: var(--navy);
+            overflow: hidden;
+            white-space: nowrap;
+            padding: 15px 0;
+        }
+
+        .marquee-inner {
+            display: inline-flex;
+            animation: roll 28s linear infinite;
+        }
+
+        @keyframes roll {
+            from {
+                transform: translateX(0);
+            }
+
+            to {
+                transform: translateX(-50%);
+            }
+        }
+
+        .m-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 36px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .m-dot {
+            color: var(--orange);
+            font-size: 14px;
+        }
+
+        /* ═══════════════════════════════════
+   ABOUT
+═══════════════════════════════════ */
+        #about {
+            padding: 110px 8vw;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 90px;
+            align-items: center;
+        }
+
+        .about-mosaic {
+            position: relative;
+            height: 560px;
+        }
+
+        .am-1,
+        .am-2,
+        .am-3 {
+            position: absolute;
+            border-radius: var(--radius-lg);
+            background-size: cover;
+            background-position: center;
+            box-shadow: var(--sh-lg);
+        }
+
+        .am-1 {
+            top: 0;
+            left: 0;
+            right: 80px;
+            bottom: 80px;
+            background-image: url('https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?w=700&q=80');
+        }
+
+        .am-2 {
+            bottom: 0;
+            right: 0;
+            width: 52%;
+            height: 52%;
+            background-image: url('https://images.unsplash.com/photo-1578575437130-527eed3abbec?w=500&q=80');
+            border: 5px solid white;
+        }
+
+        .am-3 {
+            top: 50%;
+            right: 0;
+            transform: translateY(-160%);
+            width: 30%;
+            height: 22%;
+            background-image: url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=400&q=80');
+            border: 5px solid white;
+        }
+
+        .am-badge {
+            position: absolute;
+            top: 20px;
+            right: 64px;
+            background: var(--orange);
+            color: white;
+            border-radius: var(--radius);
+            padding: 18px 22px;
+            text-align: center;
+            box-shadow: 0 10px 28px rgba(232, 82, 10, 0.38);
+            z-index: 2;
+        }
+
+        .am-badge .yr {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 40px;
+            line-height: 1;
+        }
+
+        .am-badge .lbl {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.75;
+        }
+
+        .about-r>*+* {
+            margin-top: 24px;
+        }
+
+        .about-pills {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 36px;
+        }
+
+        .pill {
+            background: var(--mist);
+            border: 1px solid var(--rule);
+            border-radius: var(--radius);
+            padding: 18px;
+            display: flex;
+            gap: 13px;
+            align-items: flex-start;
+            transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s;
+        }
+
+        .pill:hover {
+            border-color: rgba(232, 82, 10, 0.3);
+            box-shadow: 0 6px 24px rgba(232, 82, 10, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .pill-icon {
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+            border-radius: 8px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+            box-shadow: var(--sh);
+        }
+
+        .pill-hd {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--navy);
+            margin-bottom: 3px;
+        }
+
+        .pill-bd {
+            font-size: 11.5px;
+            color: var(--silver);
+            line-height: 1.5;
+        }
+
+        /* ═══════════════════════════════════
+   STATS COUNTER STRIP
+═══════════════════════════════════ */
+        #stats-strip {
+            background: var(--orange);
+            padding: 64px 8vw;
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0;
+        }
+
+        .stat-item {
+            text-align: center;
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0 32px;
+        }
+
+        .stat-item:last-child {
+            border-right: none;
+        }
+
+        .stat-n {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 68px;
+            line-height: 1;
+            color: white;
+        }
+
+        .stat-suf {
+            font-size: 40px;
+            opacity: 0.7;
+        }
+
+        .stat-l {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: rgba(255, 255, 255, 0.65);
+            margin-top: 8px;
+        }
+
+        /* ═══════════════════════════════════
+   VISION MISSION VALUES
+═══════════════════════════════════ */
+        #vmv {
+            background: var(--navy);
+            padding: 110px 8vw;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #vmv::before {
+            content: '';
+            position: absolute;
+            top: -150px;
+            right: -150px;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(232, 82, 10, 0.10) 0%, transparent 65%);
+            pointer-events: none;
+        }
+
+        #vmv::after {
+            content: 'NG&J';
+            position: absolute;
+            bottom: -40px;
+            left: 6vw;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 280px;
+            line-height: 1;
+            color: rgba(255, 255, 255, 0.025);
+            pointer-events: none;
+            letter-spacing: 10px;
+        }
+
+        .vmv-top {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 60px;
+            align-items: center;
+            margin-bottom: 64px;
+        }
+
+        .vmv-top-r .body-txt {
+            color: rgba(255, 255, 255, 0.55);
+            max-width: 560px;
+        }
+
+        .vmv-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+
+        .vc {
+            background: rgba(255, 255, 255, 0.04);
+            padding: 44px 36px;
+            position: relative;
+            overflow: hidden;
+            transition: background 0.3s;
+        }
+
+        .vc:hover {
+            background: rgba(255, 255, 255, 0.07);
+        }
+
+        .vc-ghost {
+            position: absolute;
+            top: 10px;
+            right: 16px;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 88px;
+            line-height: 1;
+            color: rgba(255, 255, 255, 0.04);
+            pointer-events: none;
+        }
+
+        .vc-emoji {
+            font-size: 38px;
+            margin-bottom: 22px;
+            display: block;
+        }
+
+        .vc-ttl {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 26px;
+            letter-spacing: 1px;
+            color: white;
+            margin-bottom: 14px;
+        }
+
+        .vc-body {
+            font-size: 13.5px;
+            line-height: 1.82;
+            color: rgba(255, 255, 255, 0.55);
+            font-weight: 300;
+        }
+
+        .values-ticker {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-top: 52px;
+        }
+
+        .vtag {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 99px;
+            padding: 10px 20px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.4px;
+            color: rgba(255, 255, 255, 0.7);
+            transition: background 0.2s, border-color 0.2s;
+        }
+
+        .vtag:hover {
+            background: var(--orange-mid);
+            border-color: rgba(232, 82, 10, 0.4);
+            color: white;
+        }
+
+        .vtag-icon {
+            font-size: 15px;
+        }
+
+        /* ═══════════════════════════════════
+   SERVICES
+═══════════════════════════════════ */
+        #services {
+            padding: 110px 8vw;
+            background: var(--mist);
+        }
+
+        .svc-header {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px;
+            align-items: flex-end;
+            margin-bottom: 60px;
+        }
+
+        /* Filter tabs */
+        .svc-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 36px;
+            flex-wrap: wrap;
+        }
+
+        .stab {
+            padding: 8px 18px;
+            border-radius: 99px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            border: 1.5px solid var(--rule);
+            background: white;
+            color: var(--slate);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .stab.active,
+        .stab:hover {
+            background: var(--orange);
+            border-color: var(--orange);
+            color: white;
+        }
+
+        .svc-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 22px;
+        }
+
+        .sc {
+            background: white;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--sh);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sc:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--sh-xl);
+        }
+
+        .sc.wide {
+            grid-column: span 2;
+        }
+
+        .sc-img {
+            height: 200px;
+            flex-shrink: 0;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .sc.wide .sc-img {
+            height: 260px;
+        }
+
+        .sc-img::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(15, 30, 51, 0.65) 0%, transparent 55%);
+        }
+
+        .sc-chip {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            z-index: 1;
+            background: var(--orange);
+            color: white;
+            border-radius: 99px;
+            padding: 4px 12px;
+            font-size: 9.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .sc-body {
+            padding: 24px 26px 28px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sc-ttl {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 22px;
+            letter-spacing: 0.5px;
+            color: var(--navy);
+            margin-bottom: 9px;
+        }
+
+        .sc-desc {
+            font-size: 13px;
+            line-height: 1.72;
+            color: var(--slate);
+            font-weight: 300;
+            flex: 1;
+        }
+
+        .sc-link {
+            margin-top: 18px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--orange);
+            text-decoration: none;
+            transition: gap 0.2s;
+        }
+
+        .sc:hover .sc-link {
+            gap: 12px;
+        }
+
+        /* ═══════════════════════════════════
+   HOW IT WORKS
+═══════════════════════════════════ */
+        #process {
+            padding: 110px 8vw;
+            background: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #process::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--rule);
+        }
+
+        .proc-header {
+            max-width: 580px;
+            margin-bottom: 72px;
+        }
+
+        .proc-track {
+            position: relative;
+        }
+
+        .proc-line {
+            position: absolute;
+            top: 36px;
+            left: 36px;
+            right: 36px;
+            height: 2px;
+            background: var(--rule);
+            z-index: 0;
+        }
+
+        .proc-line-fill {
+            height: 100%;
+            background: var(--orange);
+            width: 0;
+            transition: width 1.4s ease;
+            border-radius: 1px;
+        }
+
+        .proc-steps {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .ps {
+            text-align: center;
+            padding: 0 8px;
+        }
+
+        .ps-circle {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid var(--rule);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            margin: 0 auto 22px;
+            transition: border-color 0.4s, box-shadow 0.4s, transform 0.4s;
+            position: relative;
+            z-index: 2;
+        }
+
+        .ps.active .ps-circle {
+            border-color: var(--orange);
+            box-shadow: 0 0 0 6px rgba(232, 82, 10, 0.1);
+            transform: scale(1.1);
+        }
+
+        .ps-n {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--orange);
+            color: white;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ps-ttl {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--navy);
+            margin-bottom: 7px;
+        }
+
+        .ps-desc {
+            font-size: 12px;
+            line-height: 1.6;
+            color: var(--silver);
+        }
+
+        /* ═══════════════════════════════════
+   QUOTE CALCULATOR
+═══════════════════════════════════ */
+        #calculator {
+            padding: 100px 8vw;
+            background: var(--navy);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #calculator::after {
+            content: '';
+            position: absolute;
+            bottom: -80px;
+            right: -80px;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(232, 82, 10, 0.12) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .calc-wrap {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+        }
+
+        .calc-l .body-txt {
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 20px;
+        }
+
+        .calc-form {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-lg);
+            padding: 40px;
+        }
+
+        .calc-form-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 28px;
+            color: white;
+            margin-bottom: 28px;
+            letter-spacing: 0.5px;
+        }
+
+        .cf-group {
+            margin-bottom: 18px;
+        }
+
+        .cf-group label {
+            display: block;
+            font-size: 10.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 9px;
+        }
+
+        .cf-group input,
+        .cf-group select {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 8px;
+            padding: 13px 16px;
+            font-family: 'Sora', sans-serif;
+            font-size: 14px;
+            color: white;
+            outline: none;
+            transition: border-color 0.2s, background 0.2s;
+            -webkit-appearance: none;
+        }
+
+        .cf-group input::placeholder {
+            color: rgba(255, 255, 255, 0.25);
+        }
+
+        .cf-group input:focus,
+        .cf-group select:focus {
+            border-color: var(--orange);
+            background: rgba(255, 255, 255, 0.09);
+        }
+
+        .cf-group select option {
+            background: var(--navy-mid);
+            color: white;
+        }
+
+        .cf-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .calc-output {
+            background: rgba(232, 82, 10, 0.12);
+            border: 1px solid rgba(232, 82, 10, 0.3);
+            border-radius: 10px;
+            padding: 22px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 22px;
+            margin-bottom: 18px;
+            display: none;
+        }
+
+        .calc-output.show {
+            display: flex;
+        }
+
+        .co-lbl {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .co-price {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 42px;
+            color: var(--orange);
+            line-height: 1;
+        }
+
+        .co-note {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.3);
+            margin-top: 3px;
+        }
+
+        .btn-calc {
+            width: 100%;
+            background: var(--orange);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Sora', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.15s;
+        }
+
+        .btn-calc:hover {
+            background: var(--orange-lt);
+            transform: translateY(-1px);
+        }
+
+        /* ═══════════════════════════════════
+   TEAM
+═══════════════════════════════════ */
+        #team {
+            padding: 110px 8vw;
+            background: var(--mist);
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 18px;
+            margin-top: 56px;
+        }
+
+        .tc {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 30px 18px 24px;
+            text-align: center;
+            border: 1.5px solid var(--rule);
+            transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tc::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--orange);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s;
+        }
+
+        .tc:hover {
+            border-color: rgba(232, 82, 10, 0.25);
+            box-shadow: 0 10px 36px rgba(232, 82, 10, 0.10);
+            transform: translateY(-5px);
+        }
+
+        .tc:hover::before {
+            transform: scaleX(1);
+        }
+
+        .tc-av {
+            width: 76px;
+            height: 76px;
+            border-radius: 50%;
+            margin: 0 auto 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 26px;
+            color: white;
+            position: relative;
+        }
+
+        .tc-av::after {
+            content: '';
+            position: absolute;
+            bottom: 1px;
+            right: 1px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--orange);
+            border: 2.5px solid white;
+        }
+
+        .tc-nm {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 16.5px;
+            letter-spacing: 0.5px;
+            color: var(--navy);
+            margin-bottom: 4px;
+        }
+
+        .tc-role {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--orange);
+            margin-bottom: 13px;
+        }
+
+        .tc-bio {
+            font-size: 11.5px;
+            line-height: 1.65;
+            color: var(--silver);
+            font-weight: 300;
+        }
+
+        /* ═══════════════════════════════════
+   NETWORK / WHY CHOOSE US
+═══════════════════════════════════ */
+        #network {
+            padding: 110px 8vw;
+            background: white;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+        }
+
+        .network-img-block {
+            position: relative;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            height: 540px;
+        }
+
+        .network-img-block>.nb-bg {
+            position: absolute;
+            inset: 0;
+            background: url('https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=800&q=80') center/cover;
+        }
+
+        .network-img-block::after {
+            content: 'SHERQ';
+            position: absolute;
+            bottom: -10px;
+            right: -8px;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 130px;
+            line-height: 1;
+            color: rgba(232, 82, 10, 0.10);
+            pointer-events: none;
+        }
+
+        .why-list {
+            margin-top: 40px;
+        }
+
+        .why-item {
+            display: flex;
+            gap: 20px;
+            padding: 22px 0;
+            border-bottom: 1px solid var(--rule);
+            align-items: flex-start;
+            transition: padding-left 0.25s;
+        }
+
+        .why-item:hover {
+            padding-left: 8px;
+        }
+
+        .why-item:last-child {
+            border-bottom: none;
+        }
+
+        .wi-icon {
+            width: 44px;
+            height: 44px;
+            flex-shrink: 0;
+            background: var(--orange-pale);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 19px;
+        }
+
+        .wi-hd {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--navy);
+            margin-bottom: 5px;
+        }
+
+        .wi-bd {
+            font-size: 13px;
+            line-height: 1.65;
+            color: var(--slate);
+            font-weight: 300;
+        }
+
+        /* ═══════════════════════════════════
+   TESTIMONIALS
+═══════════════════════════════════ */
+        #testimonials {
+            padding: 110px 8vw;
+            background: var(--mist);
+            overflow: hidden;
+        }
+
+        .testi-track-wrap {
+            position: relative;
+            margin-top: 56px;
+        }
+
+        .testi-track {
+            display: flex;
+            gap: 24px;
+            overflow: hidden;
+            padding-bottom: 8px;
+        }
+
+        .tcard {
+            min-width: 380px;
+            max-width: 380px;
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 36px 32px;
+            box-shadow: var(--sh);
+            border: 1.5px solid var(--rule);
+            position: relative;
+            flex-shrink: 0;
+            transition: box-shadow 0.3s;
+        }
+
+        .tcard:hover {
+            box-shadow: var(--sh-lg);
+        }
+
+        .tcard-quote {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 72px;
+            line-height: 0.8;
+            color: var(--orange-pale);
+            margin-bottom: -12px;
+        }
+
+        .tcard-text {
+            font-size: 14.5px;
+            line-height: 1.8;
+            color: var(--slate);
+            font-style: italic;
+            font-weight: 300;
+            margin-bottom: 28px;
+        }
+
+        .tcard-author {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .ta-av {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 16px;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .ta-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--navy);
+        }
+
+        .ta-co {
+            font-size: 11px;
+            color: var(--silver);
+            font-weight: 500;
+            margin-top: 2px;
+        }
+
+        .stars {
+            color: var(--orange);
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+
+        .testi-arrows {
+            display: flex;
+            gap: 10px;
+            margin-top: 36px;
+        }
+
+        .ta-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 1.5px solid var(--rule);
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.2s;
+        }
+
+        .ta-btn:hover {
+            border-color: var(--orange);
+            background: var(--orange);
+            color: white;
+        }
+
+        /* ═══════════════════════════════════
+   CONTACT + FORM
+═══════════════════════════════════ */
+        #contact {
+            padding: 110px 8vw;
+            background: var(--navy);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: start;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #contact::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 40%;
+            background: rgba(232, 82, 10, 0.04);
+            clip-path: polygon(20% 0%, 100% 0%, 100% 100%, 0% 100%);
+            pointer-events: none;
+        }
+
+        .contact-l .body-txt {
+            color: rgba(255, 255, 255, 0.5);
+            max-width: 420px;
+            margin-top: 20px;
+        }
+
+        .contact-deets {
+            margin-top: 44px;
+        }
+
+        .cd-item {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+            padding: 18px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+        }
+
+        .cd-item:last-child {
+            border-bottom: none;
+        }
+
+        .cd-icon {
+            width: 44px;
+            height: 44px;
+            flex-shrink: 0;
+            background: rgba(232, 82, 10, 0.14);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .cd-l {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--orange);
+            margin-bottom: 5px;
+        }
+
+        .cd-v {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.75);
+            line-height: 1.6;
+        }
+
+        .contact-form-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-lg);
+            padding: 44px;
+        }
+
+        .cfc-ttl {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 34px;
+            letter-spacing: 0.5px;
+            color: white;
+            margin-bottom: 6px;
+        }
+
+        .cfc-sub {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 36px;
+        }
+
+        .fg {
+            margin-bottom: 16px;
+        }
+
+        .fg label {
+            display: block;
+            font-size: 10.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 8px;
+        }
+
+        .fg input,
+        .fg select,
+        .fg textarea {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 8px;
+            padding: 13px 16px;
+            font-family: 'Sora', sans-serif;
+            font-size: 14px;
+            color: white;
+            outline: none;
+            transition: border-color 0.2s, background 0.2s;
+            -webkit-appearance: none;
+        }
+
+        .fg input::placeholder,
+        .fg textarea::placeholder {
+            color: rgba(255, 255, 255, 0.25);
+        }
+
+        .fg input:focus,
+        .fg select:focus,
+        .fg textarea:focus {
+            border-color: var(--orange);
+            background: rgba(255, 255, 255, 0.09);
+        }
+
+        .fg select option {
+            background: var(--navy-mid);
+            color: white;
+        }
+
+        .fg textarea {
+            resize: vertical;
+            min-height: 110px;
+        }
+
+        .fg-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .btn-send {
+            width: 100%;
+            background: var(--orange);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: 'Sora', sans-serif;
+            font-size: 13.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: background 0.2s, transform 0.15s;
+        }
+
+        .btn-send:hover {
+            background: var(--orange-lt);
+            transform: translateY(-1px);
+        }
+
+        /* success message */
+        .success-msg {
+            display: none;
+            text-align: center;
+            padding: 32px;
+            color: white;
+        }
+
+        .success-msg .sm-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        .success-msg h3 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .success-msg p {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* ═══════════════════════════════════
+   FOOTER
+═══════════════════════════════════ */
+        footer {
+            background: #07111F;
+            padding: 60px 8vw 36px;
+        }
+
+        .footer-top {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 48px;
+            padding-bottom: 48px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+        }
+
+        .ft-brand {}
+
+        .ft-brand .logo-nm {
+            color: white;
+        }
+
+        .ft-brand .logo-tag {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .ft-desc {
+            font-size: 13px;
+            line-height: 1.75;
+            color: rgba(255, 255, 255, 0.35);
+            margin: 18px 0 24px;
+            max-width: 280px;
+        }
+
+        .ft-social {
+            display: flex;
+            gap: 10px;
+        }
+
+        .social-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            text-decoration: none;
+            color: rgba(255, 255, 255, 0.5);
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .social-btn:hover {
+            background: var(--orange);
+            color: white;
+        }
+
+        .ft-col-ttl {
+            font-size: 10.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: rgba(255, 255, 255, 0.25);
+            margin-bottom: 18px;
+        }
+
+        .ft-col ul {
+            list-style: none;
+        }
+
+        .ft-col ul li {
+            margin-bottom: 10px;
+        }
+
+        .ft-col ul li a {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.45);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .ft-col ul li a:hover {
+            color: white;
+        }
+
+        .footer-bot {
+            padding-top: 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+
+        .fb-copy {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.22);
+        }
+
+        .fb-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .fb-links a {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.25);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .fb-links a:hover {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* ── BACK TO TOP ── */
+        #btt {
+            position: fixed;
+            bottom: 96px;
+            right: 34px;
+            z-index: 300;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: white;
+            border: 1.5px solid var(--rule);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            text-decoration: none;
+            color: var(--navy);
+            box-shadow: var(--sh);
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(10px);
+            transition: opacity 0.3s, transform 0.3s, background 0.2s, color 0.2s;
+        }
+
+        #btt.show {
+            opacity: 1;
+            pointer-events: all;
+            transform: translateY(0);
+        }
+
+        #btt:hover {
+            background: var(--navy);
+            color: white;
+        }
+
+        /* ═══════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════ */
+        @media (max-width: 1100px) {
+            .team-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 40px;
+            }
+
+            .stat-item {
+                border-right: none;
+                padding: 16px 0;
+            }
+
+            .proc-steps {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .proc-line {
+                display: none;
+            }
+
+            .svc-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .sc.wide {
+                grid-column: span 2;
+            }
+
+            .footer-top {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 900px) {
+            #hero {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-r {
+                height: 55vw;
+                clip-path: none;
+            }
+
+            #about {
+                grid-template-columns: 1fr;
+            }
+
+            .about-mosaic {
+                height: 380px;
+            }
+
+            .vmv-top {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+
+            .vmv-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .svc-header {
+                grid-template-columns: 1fr;
+            }
+
+            .calc-wrap {
+                grid-template-columns: 1fr;
+            }
+
+            #network {
+                grid-template-columns: 1fr;
+            }
+
+            .network-img-block {
+                height: 340px;
+            }
+
+            #contact {
+                grid-template-columns: 1fr;
+            }
+
+            .tcard {
+                min-width: 300px;
+                max-width: 300px;
+            }
+        }
+
+        @media (max-width: 700px) {
+
+            .nav-center,
+            .nav-right {
+                display: none;
+            }
+
+            .nav-burger {
+                display: flex;
+            }
+
+            .team-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .svc-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .sc.wide {
+                grid-column: span 1;
+            }
+
+            .proc-steps {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .fg-row {
+                grid-template-columns: 1fr;
+            }
+
+            .cf-row {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-top {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-kpis {
+                gap: 28px;
+            }
+
+            .float-cta .cta-label {
+                display: none;
+            }
+
+            .float-cta {
+                padding: 14px 16px;
+                border-radius: 50%;
+            }
+
+            #btt {
+                bottom: 90px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Custom cursor -->
+    <div class="cursor" id="cur"></div>
+    <div class="cursor-ring" id="curR"></div>
+
+    <!-- Page loader -->
+    <div id="loader">
+        <div class="loader-logo">NG<span>&</span>J SWIFT</div>
+        <div class="loader-bar-wrap">
+            <div class="loader-bar"></div>
+        </div>
+        <div class="loader-text">Loading Excellence</div>
+    </div>
+
+    <!-- Scroll bar -->
+    <div id="sbar"></div>
+
+    <!-- ══════════════ NAVBAR ══════════════ -->
+    <nav id="nav">
+        <a href="#hero" class="nav-logo">
+            <div class="logo-emblem">
+                <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="22" cy="22" r="20" fill="#0F1E33" stroke="#0F1E33" stroke-width="0" />
+                    <text x="8" y="28" font-family="Bebas Neue" font-size="14" fill="white"
+                        letter-spacing="1">N&J</text>
+                    <circle cx="34" cy="34" r="8" fill="#E8520A" />
+                </svg>
+            </div>
+            <div class="logo-wordmark">
+                <div class="logo-nm">NG & J SWIFT</div>
+                <div class="logo-tag">Haulage & Logistics Limited</div>
+            </div>
+        </a>
+
+        <ul class="nav-center">
+            <li><a href="#about">About</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#process">Process</a></li>
+            <li><a href="#team">Team</a></li>
+            <li><a href="#testimonials">Clients</a></li>
+        </ul>
+
+        <div class="nav-right">
+            <a href="#contact" class="btn-quote">
+                Get a Quote
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+            </a>
+        </div>
+
+        <div class="nav-burger" id="burger" onclick="toggleNav()">
+            <span></span><span></span><span></span>
+        </div>
+    </nav>
+
+    <div class="mobile-menu" id="mmenu">
+        <a href="#about" onclick="closeNav()">About</a>
+        <a href="#services" onclick="closeNav()">Services</a>
+        <a href="#process" onclick="closeNav()">How It Works</a>
+        <a href="#team" onclick="closeNav()">Team</a>
+        <a href="#testimonials" onclick="closeNav()">Clients</a>
+        <a href="#contact" class="mm-cta" onclick="closeNav()">Get a Quote →</a>
+    </div>
+
+    <!-- ══════════════ HERO ══════════════ -->
+    <section id="hero">
+        <div class="road-lines"></div>
+
+        <div class="hero-l">
+            <div class="tag fade-in">
+                <div class="tag-dot"></div>
+                International Haulage & Logistics — Est. 2013
+            </div>
+
+            <h1 class="fade-in d1">
+                YOUR<br>
+                <span class="accent-o">NEXT</span><br>
+                <span class="accent-i">LOAD.</span>
+            </h1>
+
+            <p class="hero-tagline fade-in d2">
+                International air, sea, and land-based logistics built for West Africa and the world.
+                We design cost-effective solutions to even the most complex global supply chain challenges.
+            </p>
+
+            <div class="hero-btns fade-in d3">
+                <a href="#contact" class="btn-primary">
+                    Request a Quote
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5">
+                        <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                </a>
+                <a href="#services" class="btn-outline">
+                    Our Services
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5">
+                        <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                </a>
+            </div>
+
+            <div class="hero-kpis fade-in d4">
+                <div>
+                    <div class="kpi-num"><span id="k1" data-target="12">0</span><span>+</span></div>
+                    <div class="kpi-lbl">Years in Operations</div>
+                </div>
+                <div>
+                    <div class="kpi-num"><span id="k2" data-target="6">0</span></div>
+                    <div class="kpi-lbl">Service Verticals</div>
+                </div>
+                <div>
+                    <div class="kpi-num" style="font-size:36px">24<span>/7</span></div>
+                    <div class="kpi-lbl">Client Support</div>
+                </div>
+                <div>
+                    <div class="kpi-num">3PL</div>
+                    <div class="kpi-lbl">Certified Provider</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="hero-r fade-in d2">
+            <div class="hero-img-bg"></div>
+
+            <div class="hero-card c1 fade-in d4">
+                <div class="hc-icon o">🚚</div>
+                <div>
+                    <div class="hc-title">6</div>
+                    <div class="hc-sub">Service Lines</div>
+                </div>
+            </div>
+
+            <div class="hero-card c2 fade-in d5">
+                <div class="hc-icon b">🌍</div>
+                <div>
+                    <div class="hc-title">3PL</div>
+                    <div class="hc-sub">Certified</div>
+                </div>
+            </div>
+
+            <!-- rotating stamp -->
+            <div class="hero-stamp">
+                <svg viewBox="0 0 100 100">
+                    <defs>
+                        <path id="circle-text" d="M 50,50 m -37,0 a 37,37 0 1,1 74,0 a 37,37 0 1,1 -74,0" />
+                    </defs>
+                    <text fill="#E8520A" font-size="10" font-family="Sora" font-weight="700" letter-spacing="3">
+                        <textPath href="#circle-text">NG&J SWIFT • LOGISTICS • EST 2013 • </textPath>
+                    </text>
+                    <text x="50" y="54" text-anchor="middle" fill="#0F1E33" font-family="Bebas Neue" font-size="12"
+                        letter-spacing="1">3PL</text>
+                </svg>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════ MARQUEE ══════════════ -->
+    <div class="marquee-band">
+        <div class="marquee-inner">
+            <span class="m-item"><span class="m-dot">●</span> Land Transportation</span>
+            <span class="m-item"><span class="m-dot">●</span> Ocean Freight</span>
+            <span class="m-item"><span class="m-dot">●</span> Air Freight</span>
+            <span class="m-item"><span class="m-dot">●</span> Warehousing & Storage</span>
+            <span class="m-item"><span class="m-dot">●</span> Global Logistics</span>
+            <span class="m-item"><span class="m-dot">●</span> Project Cargo</span>
+            <span class="m-item"><span class="m-dot">●</span> Supply Chain Solutions</span>
+            <span class="m-item"><span class="m-dot">●</span> 24/7 Support</span>
+            <span class="m-item"><span class="m-dot">●</span> Land Transportation</span>
+            <span class="m-item"><span class="m-dot">●</span> Ocean Freight</span>
+            <span class="m-item"><span class="m-dot">●</span> Air Freight</span>
+            <span class="m-item"><span class="m-dot">●</span> Warehousing & Storage</span>
+            <span class="m-item"><span class="m-dot">●</span> Global Logistics</span>
+            <span class="m-item"><span class="m-dot">●</span> Project Cargo</span>
+            <span class="m-item"><span class="m-dot">●</span> Supply Chain Solutions</span>
+            <span class="m-item"><span class="m-dot">●</span> 24/7 Support</span>
+        </div>
+    </div>
+
+    <!-- ══════════════ ABOUT ══════════════ -->
+    <section id="about">
+        <div class="about-mosaic fade-in">
+            <div class="am-1"></div>
+            <div class="am-2"></div>
+            <div class="am-3"></div>
+            <div class="am-badge">
+                <div class="yr">2013</div>
+                <div class="lbl">Founded</div>
+            </div>
+        </div>
+
+        <div class="about-r">
+            <div class="tag fade-in">
+                <div class="tag-dot"></div>About Us
+            </div>
+            <h2 class="big fade-in d1">GLOBAL SUPPLY<br><span class="o">CHAIN</span> MASTERY</h2>
+            <p class="body-txt fade-in d2">
+                NG&J Swift Haulage & Logistics Limited is an international air, sea, and land-based logistics provider
+                established in 2013. We have grown into a leading provider of third-party logistics (3PL) and supply
+                chain solutions to enterprises across West Africa.
+            </p>
+            <p class="body-txt fade-in d2" style="margin-top:14px">
+                From retail and consumer packaged goods to automotive and beyond, our customers depend on us to drive
+                their businesses forward through the highest standard of integrity, ingenuity, and reliable service. Our
+                team is accessible 24 hours a day, 7 days a week, 365 days a year.
+            </p>
+
+            <div class="about-pills fade-in d3">
+                <div class="pill">
+                    <div class="pill-icon">⚡</div>
+                    <div>
+                        <div class="pill-hd">Agility First</div>
+                        <div class="pill-bd">Fast, innovative logistics responses</div>
+                    </div>
+                </div>
+                <div class="pill">
+                    <div class="pill-icon">🤝</div>
+                    <div>
+                        <div class="pill-hd">Relationships</div>
+                        <div class="pill-bd">Long-term trust with all partners</div>
+                    </div>
+                </div>
+                <div class="pill">
+                    <div class="pill-icon">🌍</div>
+                    <div>
+                        <div class="pill-hd">Global Reach</div>
+                        <div class="pill-bd">All major trading centers worldwide</div>
+                    </div>
+                </div>
+                <div class="pill">
+                    <div class="pill-icon">🛡️</div>
+                    <div>
+                        <div class="pill-hd">SHERQ Compliant</div>
+                        <div class="pill-bd">Safety & quality assured</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════ STATS STRIP ══════════════ -->
+    <div id="stats-strip">
+        <div class="stats-row">
+            <div class="stat-item fade-in">
+                <div class="stat-n"><span class="cnt" data-target="12" data-suf="+">0</span><span
+                        class="stat-suf">+</span></div>
+                <div class="stat-l">Years Experience</div>
+            </div>
+            <div class="stat-item fade-in d1">
+                <div class="stat-n"><span class="cnt" data-target="100" data-suf="+">0</span><span
+                        class="stat-suf">+</span></div>
+                <div class="stat-l">Clients Served</div>
+            </div>
+            <div class="stat-item fade-in d2">
+                <div class="stat-n"><span class="cnt" data-target="365">0</span></div>
+                <div class="stat-l">Days/Year Available</div>
+            </div>
+            <div class="stat-item fade-in d3">
+                <div class="stat-n"><span class="cnt" data-target="6">0</span></div>
+                <div class="stat-l">Service Verticals</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════ VISION MISSION VALUES ══════════════ -->
+    <section id="vmv">
+        <div class="vmv-top">
+            <div>
+                <div class="tag" style="background:rgba(232,82,10,0.12);border-color:rgba(232,82,10,0.2)">
+                    <div class="tag-dot"></div>
+                    <span style="color:var(--orange)">Our Foundation</span>
+                </div>
+                <h2 class="big fade-in d1" style="color:white;margin-top:18px">VISION<br><span
+                        class="o">MISSION</span><br>& VALUES</h2>
+            </div>
+            <div class="vmv-top-r fade-in d2">
+                <p class="body-txt" style="color:rgba(255,255,255,0.5)">
+                    At NG&J Swift, our purpose, direction, and principles are not aspirational — they are operational.
+                    Every shipment, every client interaction, every decision is guided by these foundations.
+                </p>
+            </div>
+        </div>
+
+        <div class="vmv-cards fade-in d2">
+            <div class="vc">
+                <div class="vc-ghost">01</div>
+                <span class="vc-emoji">🔭</span>
+                <div class="vc-ttl">Our Vision</div>
+                <div class="vc-body">To act as an indispensable partner to our clients — helping them build and maximize
+                    sustainable competitive advantages by getting their products to market quickly, efficiently, and
+                    safely. Every interaction is driven by integrity and respect, the fundamental principles of our
+                    business.</div>
+            </div>
+            <div class="vc">
+                <div class="vc-ghost">02</div>
+                <span class="vc-emoji">🎯</span>
+                <div class="vc-ttl">Our Mission</div>
+                <div class="vc-body">To deliver a positive, reliable experience to each and every client while offering
+                    exceptional value in the marketplace and setting the standard for professionalism in logistic
+                    solutions. We operate profitably, responsibly, and with a safe and secure work environment for all.
+                </div>
+            </div>
+            <div class="vc">
+                <div class="vc-ghost">03</div>
+                <span class="vc-emoji">💎</span>
+                <div class="vc-ttl">Our Values</div>
+                <div class="vc-body">Strong relationships, agility and responsiveness, positive impact on customer
+                    success, and trust. These are not corporate slogans — they are measurable commitments we make to
+                    every client, every carrier partner, and every team member.</div>
+            </div>
+        </div>
+
+        <div class="values-ticker fade-in d3">
+            <div class="vtag"><span class="vtag-icon">🤝</span> Strong Relationships</div>
+            <div class="vtag"><span class="vtag-icon">⚡</span> Agility & Responsiveness</div>
+            <div class="vtag"><span class="vtag-icon">📈</span> Customer Success</div>
+            <div class="vtag"><span class="vtag-icon">🛡️</span> Trust & Integrity</div>
+            <div class="vtag"><span class="vtag-icon">🌱</span> Environmental Responsibility</div>
+            <div class="vtag"><span class="vtag-icon">🏆</span> Quality Excellence</div>
+            <div class="vtag"><span class="vtag-icon">🌍</span> Global Standards</div>
+            <div class="vtag"><span class="vtag-icon">🔒</span> Safety First</div>
+        </div>
+    </section>
+
+    <!-- ══════════════ SERVICES ══════════════ -->
+    <section id="services">
+        <div class="svc-header">
+            <div>
+                <div class="tag fade-in">
+                    <div class="tag-dot"></div>What We Do
+                </div>
+                <h2 class="big fade-in d1" style="margin-top:18px">OUR <span class="o">SERVICES</span></h2>
+            </div>
+            <p class="body-txt fade-in d2">Whether your shipment travels over the road, through the air, or across the
+                ocean — our expert team and carrier network ensure it arrives on time, every time.</p>
+        </div>
+
+        <div class="svc-tabs fade-in d1">
+            <button class="stab active" onclick="filterSvc('all',this)">All Services</button>
+            <button class="stab" onclick="filterSvc('freight',this)">Freight</button>
+            <button class="stab" onclick="filterSvc('storage',this)">Warehousing</button>
+            <button class="stab" onclick="filterSvc('project',this)">Special Projects</button>
+        </div>
+
+        <div class="svc-grid">
+            <div class="sc wide fade-in" data-cat="freight">
+                <div class="sc-img"
+                    style="background-image:url('https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?w=1000&q=80')">
+                    <span class="sc-chip">Most Requested</span>
+                </div>
+                <div class="sc-body">
+                    <div class="sc-ttl">Land Transportation Services</div>
+                    <div class="sc-desc">Our land transportation division provides reliable, efficient truckload (TL)
+                        and less-than-load (LTL) services for regional and domestic shipments across Nigeria and West
+                        Africa. Our service is unparalleled thanks to our wide network of professional providers and
+                        commitment to real-time shipment tracking and communication.</div>
+                    <a href="#contact" class="sc-link">Request Service <svg width="13" height="13" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2.5">
+                            <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg></a>
+                </div>
+            </div>
+
+            <div class="sc fade-in d1" data-cat="freight">
+                <div class="sc-img"
+                    style="background-image:url('https://images.unsplash.com/photo-1578575437130-527eed3abbec?w=700&q=80')">
+                    <span class="sc-chip">Sea</span>
+                </div>
+                <div class="sc-body">
+                    <div class="sc-ttl">Ocean Freight Transportation</div>
+                    <div class="sc-desc">One-stop solution for all sea-going freight — vessel selection, documentation,
+                        monitoring and tracking, and access to the world's best ocean freight carriers.</div>
+                    <a href="#contact" class="sc-link">Request Service <svg width="13" height="13" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2.5">
+                            <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg></a>
+                </div>
+            </div>
+
+            <div class="sc fade-in d1" data-cat="freight">
+                <div class="sc-img"
+                    style="background-image:url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=700&q=80')">
+                    <span class="sc-chip">Air</span>
+                </div>
+                <div class="sc-body">
+                    <div class="sc-ttl">Air Freight Logistics</div>
+                    <div class="sc-desc">Air freight services to all major trading centers through an extensive network
+                        of airline and freight forwarding partners, including charters for large or specialized cargo.
+                    </div>
+                    <a href="#contact" class="sc-link">Request Service <svg width="13" height="13" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2.5">
+                            <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg></a>
+                </div>
+            </div>
+
+            <div class="sc fade-in d2" data-cat="storage">
+                <div class="sc-img"
+                    style="background-image:url('https://images.unsplash.com/photo-1553413077-190dd305871c?w=700&q=80')">
+                    <span class="sc-chip">Warehousing</span>
+                </div>
+                <div class="sc-body">
+                    <div class="sc-ttl">Warehousing & Distribution</div>
+                    <div class="sc-desc">Cost-effective solutions for storing and moving goods worldwide — with
+                        constant, immediate access to goods and fast, effective global distribution.</div>
+                    <a href="#contact" class="sc-link">Request Service <svg width="13" height="13" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2.5">
+                            <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg></a>
+                </div>
+            </div>
+
+            <div class="sc fade-in d2" data-cat="project">
+                <div class="sc-img"
+                    style="background-image:url('https://images.unsplash.com/photo-1493946740644-2d8a1f1a6aff?w=700&q=80')">
+                    <span class="sc-chip">Global</span>
+                </div>
+                <div class="sc-body">
+                    <div class="sc-ttl">Global Logistics</div>
+                    <div class="sc-desc">Custom tailored solutions designed to take full advantage of all available
+                        efficiencies in supply chains across West Africa and internationally.</div>
+                    <a href="#contact" class="sc-link">Request Service <svg width="13" height="13" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2.5">
+                            <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg></a>
+                </div>
+            </div>
+
+            <div class="sc fade-in d3" data-cat="project">
+                <div class="sc-img"
+                    style="background-image:url('https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=700&q=80')">
+                    <span class="sc-chip">Project</span>
+                </div>
+                <div class="sc-body">
+                    <div class="sc-ttl">Project Cargo</div>
+                    <div class="sc-desc">Full-scope management of complex cargo projects — risk evaluation, cost
+                        analysis, route surveying, documentation, and packing coordination.</div>
+                    <a href="#contact" class="sc-link">Request Service <svg width="13" height="13" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2.5">
+                            <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════ PROCESS ══════════════ -->
+    <section id="process">
+        <div class="proc-header">
+            <div class="tag fade-in">
+                <div class="tag-dot"></div>How It Works
+            </div>
+            <h2 class="big fade-in d1" style="margin-top:18px">YOUR SHIPMENT,<br><span class="o">STEP BY STEP</span>
+            </h2>
+            <p class="body-txt fade-in d2" style="margin-top:18px">From your first call to final delivery, our
+                streamlined process ensures your cargo moves with precision and confidence every time.</p>
+        </div>
+
+        <div class="proc-track">
+            <div class="proc-line">
+                <div class="proc-line-fill" id="procFill"></div>
+            </div>
+            <div class="proc-steps">
+                <div class="ps fade-in" data-step="1">
+                    <div class="ps-circle">
+                        🗣️
+                        <div class="ps-n">1</div>
+                    </div>
+                    <div class="ps-ttl">Initial Consultation</div>
+                    <div class="ps-desc">Tell us your shipment requirements and timeline. Our team assesses needs within
+                        hours.</div>
+                </div>
+                <div class="ps fade-in d1" data-step="2">
+                    <div class="ps-circle">
+                        📋
+                        <div class="ps-n">2</div>
+                    </div>
+                    <div class="ps-ttl">Custom Quote</div>
+                    <div class="ps-desc">We provide a detailed, competitive quote tailored to your specific cargo and
+                        route.</div>
+                </div>
+                <div class="ps fade-in d2" data-step="3">
+                    <div class="ps-circle">
+                        📦
+                        <div class="ps-n">3</div>
+                    </div>
+                    <div class="ps-ttl">Cargo Booking</div>
+                    <div class="ps-desc">We confirm carriers, book space, and arrange all logistics documentation and
+                        compliance.</div>
+                </div>
+                <div class="ps fade-in d3" data-step="4">
+                    <div class="ps-circle">
+                        🚀
+                        <div class="ps-n">4</div>
+                    </div>
+                    <div class="ps-ttl">Live Tracking</div>
+                    <div class="ps-desc">Monitor your shipment in real-time. Our team is available 24/7 for updates and
+                        support.</div>
+                </div>
+                <div class="ps fade-in d4" data-step="5">
+                    <div class="ps-circle">
+                        ✅
+                        <div class="ps-n">5</div>
+                    </div>
+                    <div class="ps-ttl">Safe Delivery</div>
+                    <div class="ps-desc">Your cargo arrives on time, intact, and fully documented. We confirm receipt
+                        with you.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════ QUOTE CALCULATOR ══════════════ -->
+    <section id="calculator">
+        <div class="calc-wrap">
+            <div class="calc-l">
+                <div class="tag" style="background:rgba(232,82,10,0.12);border-color:rgba(232,82,10,0.2)">
+                    <div class="tag-dot"></div>
+                    <span style="color:var(--orange)">Instant Estimate</span>
+                </div>
+                <h2 class="big fade-in d1" style="color:white;margin-top:18px">GET AN INSTANT<br><span class="o">FREIGHT
+                        QUOTE</span></h2>
+                <p class="body-txt fade-in d2">Use our quick estimator to get a ballpark for your shipment. Our team
+                    will follow up with a precise, all-inclusive quote within 24 hours.</p>
+                <div style="margin-top:36px;display:flex;flex-direction:column;gap:14px" class="fade-in d3">
+                    <div style="display:flex;gap:12px;align-items:center">
+                        <div
+                            style="width:36px;height:36px;background:rgba(232,82,10,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">
+                            📞</div>
+                        <span style="font-size:13px;color:rgba(255,255,255,0.5)">+234 01-8435 323 · +234 809 7368
+                            576</span>
+                    </div>
+                    <div style="display:flex;gap:12px;align-items:center">
+                        <div
+                            style="width:36px;height:36px;background:rgba(232,82,10,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">
+                            ✉️</div>
+                        <span style="font-size:13px;color:rgba(255,255,255,0.5)">ngjswift@yahoo.com</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="calc-form fade-in d2">
+                <div class="calc-form-title">Freight Estimator</div>
+                <div class="cf-row">
+                    <div class="cf-group">
+                        <label>Service Type</label>
+                        <select id="cSvc">
+                            <option value="">Select...</option>
+                            <option value="land">Land Transport</option>
+                            <option value="ocean">Ocean Freight</option>
+                            <option value="air">Air Freight</option>
+                            <option value="warehouse">Warehousing</option>
+                        </select>
+                    </div>
+                    <div class="cf-group">
+                        <label>Cargo Weight (kg)</label>
+                        <input type="number" id="cWeight" placeholder="e.g. 500">
+                    </div>
+                </div>
+                <div class="cf-row">
+                    <div class="cf-group">
+                        <label>Origin</label>
+                        <input type="text" id="cOrigin" placeholder="e.g. Lagos">
+                    </div>
+                    <div class="cf-group">
+                        <label>Destination</label>
+                        <input type="text" id="cDest" placeholder="e.g. Abuja">
+                    </div>
+                </div>
+                <div class="cf-group">
+                    <label>Cargo Description</label>
+                    <input type="text" id="cDesc" placeholder="e.g. Industrial equipment">
+                </div>
+                <div class="calc-output" id="calcOut">
+                    <div>
+                        <div class="co-lbl">Estimated Range</div>
+                        <div class="co-price" id="calcPrice">₦0</div>
+                        <div class="co-note">Final quote subject to full assessment</div>
+                    </div>
+                    <div style="text-align:right">
+                        <div class="co-lbl">Transit Time</div>
+                        <div style="font-family:'Bebas Neue';font-size:28px;color:white;line-height:1" id="calcTime">—
+                        </div>
+                        <div class="co-note">Estimated</div>
+                    </div>
+                </div>
+                <button class="btn-calc" onclick="calcQuote()">Calculate Estimate</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════ TEAM ══════════════ -->
+    <section id="team">
+        <div style="max-width:580px">
+            <div class="tag fade-in">
+                <div class="tag-dot"></div>Leadership
+            </div>
+            <h2 class="big fade-in d1" style="margin-top:18px">OUR EXECUTIVE <span class="o">TEAM</span></h2>
+            <p class="body-txt fade-in d2">Our leadership brings diverse expertise across healthcare, engineering, law,
+                and global business — all united by an unwavering commitment to excellence in logistics.</p>
+        </div>
+
+        <div class="team-grid">
+            <div class="tc fade-in">
+                <div class="tc-av" style="background:linear-gradient(135deg,#1A2E4A,#233A5C)">JA</div>
+                <div class="tc-nm">Joseph O. Akpara</div>
+                <div class="tc-role">Chairman / MD</div>
+                <div class="tc-bio">BSc Health Studies, Coventry University. Founded NG&J after realising the power of
+                    goods movement in driving modern economies. Extensive experience in business and public affairs.
+                </div>
+            </div>
+            <div class="tc fade-in d1">
+                <div class="tc-av" style="background:linear-gradient(135deg,#E8520A,#FF6B2B)">NA</div>
+                <div class="tc-nm">Mrs. Ngozi Akpara</div>
+                <div class="tc-role">Deputy Chairman / MD</div>
+                <div class="tc-bio">BSc Mental Health Studies, PG Diploma Community Public Health. Registered Manager,
+                    Dolphin Healthcare UK. Leadership excellence across healthcare and business management.</div>
+            </div>
+            <div class="tc fade-in d2">
+                <div class="tc-av" style="background:linear-gradient(135deg,#2D5B8A,#1A2E4A)">EA</div>
+                <div class="tc-nm">Emmanuel Akpara</div>
+                <div class="tc-role">Director</div>
+                <div class="tc-bio">Qualified medical doctor. His precision and commitment to professional development
+                    bring operational excellence to the business at every level.</div>
+            </div>
+            <div class="tc fade-in d3">
+                <div class="tc-av" style="background:linear-gradient(135deg,#2E7D32,#1B5E20)">GA</div>
+                <div class="tc-nm">Gideon Akpara</div>
+                <div class="tc-role">Director</div>
+                <div class="tc-bio">MSc Safety & Reliability Engineering, PG Diploma Petroleum Engineering, First Class
+                    Honours in Chemical Engineering. Business Development Manager, Delight Essential Services UK.</div>
+            </div>
+            <div class="tc fade-in d4">
+                <div class="tc-av" style="background:linear-gradient(135deg,#6B3A8A,#4A2660)">AE</div>
+                <div class="tc-nm">Ambrose E. Esangbedo</div>
+                <div class="tc-role">Company Secretary & Legal Adviser</div>
+                <div class="tc-bio">LLB University of Lagos 1985, Nigerian Bar 1986, LLM University of Lagos 2007. Over
+                    35 years of continuous active legal practice.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════ WHY US / SHERQ ══════════════ -->
+    <section id="network">
+        <div class="network-img-block fade-in">
+            <div class="nb-bg"></div>
+        </div>
+
+        <div>
+            <div class="tag fade-in">
+                <div class="tag-dot"></div>SHERQ & Excellence
+            </div>
+            <h2 class="big fade-in d1" style="margin-top:18px">WHY CHOOSE<br><span class="o">NG&J SWIFT?</span></h2>
+            <p class="body-txt fade-in d2" style="margin-top:16px">Our SHERQ-first approach — Safety, Health,
+                Environment, Risk, and Quality — ensures every operation meets the highest international standards.</p>
+
+            <div class="why-list fade-in d2">
+                <div class="why-item">
+                    <div class="wi-icon">🛡️</div>
+                    <div>
+                        <div class="wi-hd">Safety & Zero-Harm Culture</div>
+                        <div class="wi-bd">Every operation is planned and executed with safety as the primary
+                            consideration — for our people, your cargo, and the communities we serve.</div>
+                    </div>
+                </div>
+                <div class="why-item">
+                    <div class="wi-icon">⚡</div>
+                    <div>
+                        <div class="wi-hd">Non-Asset Based Flexibility</div>
+                        <div class="wi-bd">As a non-asset based organization with access to a significant pool of
+                            carrier partners, we focus 100% on our customers — not infrastructure maintenance.</div>
+                    </div>
+                </div>
+                <div class="why-item">
+                    <div class="wi-icon">🌱</div>
+                    <div>
+                        <div class="wi-hd">Sustainable Logistics</div>
+                        <div class="wi-bd">Environmental responsibility is embedded in every logistics decision — from
+                            route optimization to partner selection and packaging guidelines.</div>
+                    </div>
+                </div>
+                <div class="why-item">
+                    <div class="wi-icon">📊</div>
+                    <div>
+                        <div class="wi-hd">Data-Driven Risk Management</div>
+                        <div class="wi-bd">Rigorous pre-shipment risk evaluation, route analysis, and real-time
+                            monitoring ensure your cargo is protected at every stage.</div>
+                    </div>
+                </div>
+                <div class="why-item">
+                    <div class="wi-icon">🏆</div>
+                    <div>
+                        <div class="wi-hd">Relentless Quality Standards</div>
+                        <div class="wi-bd">Our quality management system means we consistently exceed client
+                            expectations — building the trust that keeps them coming back.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════ TESTIMONIALS ══════════════ -->
+    <section id="testimonials">
+        <div class="tag fade-in">
+            <div class="tag-dot"></div>Client Voices
+        </div>
+        <h2 class="big fade-in d1" style="margin-top:18px">WHAT OUR CLIENTS <span class="o">SAY</span></h2>
+
+        <div class="testi-track-wrap">
+            <div class="testi-track" id="testiTrack">
+
+                <div class="tcard fade-in">
+                    <div class="tcard-quote">"</div>
+                    <div class="stars">★★★★★</div>
+                    <div class="tcard-text">NG&J Swift transformed our supply chain operations in Lagos. Their
+                        responsiveness and professionalism is unmatched in West Africa. On-time delivery, every time.
+                    </div>
+                    <div class="tcard-author">
+                        <div class="ta-av" style="background:linear-gradient(135deg,#E8520A,#FF6B2B)">AO</div>
+                        <div>
+                            <div class="ta-name">Adeyemi Olajide</div>
+                            <div class="ta-co">Operations Manager, RetailCo Nigeria</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tcard fade-in d1">
+                    <div class="tcard-quote">"</div>
+                    <div class="stars">★★★★★</div>
+                    <div class="tcard-text">We've used multiple freight forwarders over the years, but NG&J Swift stands
+                        out. Their documentation process is flawless and their 24/7 support is genuinely 24/7.</div>
+                    <div class="tcard-author">
+                        <div class="ta-av" style="background:linear-gradient(135deg,#1A2E4A,#233A5C)">BI</div>
+                        <div>
+                            <div class="ta-name">Blessing Ihejirika</div>
+                            <div class="ta-co">Supply Chain Director, AutoParts West Africa</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tcard fade-in d2">
+                    <div class="tcard-quote">"</div>
+                    <div class="stars">★★★★★</div>
+                    <div class="tcard-text">Our ocean freight from Europe used to be a nightmare. NG&J handled
+                        everything — booking, customs, last-mile delivery. Seamless. We haven't used anyone else since.
+                    </div>
+                    <div class="tcard-author">
+                        <div class="ta-av" style="background:linear-gradient(135deg,#2E7D32,#1B5E20)">KC</div>
+                        <div>
+                            <div class="ta-name">Kwame Chamberlain</div>
+                            <div class="ta-co">CEO, Accra Trade Imports</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tcard fade-in d3">
+                    <div class="tcard-quote">"</div>
+                    <div class="stars">★★★★★</div>
+                    <div class="tcard-text">The project cargo team handled our heavy industrial equipment with
+                        extraordinary precision. Risk assessment, route planning, special handling — all executed
+                        perfectly.</div>
+                    <div class="tcard-author">
+                        <div class="ta-av" style="background:linear-gradient(135deg,#6B3A8A,#4A2660)">FN</div>
+                        <div>
+                            <div class="ta-name">Fatima Ngozi</div>
+                            <div class="ta-co">Head of Procurement, Energy Solutions Ltd</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tcard fade-in d4">
+                    <div class="tcard-quote">"</div>
+                    <div class="stars">★★★★★</div>
+                    <div class="tcard-text">What sets NG&J apart is their relationship approach. They don't just move
+                        cargo — they become a genuine extension of your team. Highly recommended for any business in
+                        West Africa.</div>
+                    <div class="tcard-author">
+                        <div class="ta-av" style="background:linear-gradient(135deg,#C62828,#B71C1C)">TO</div>
+                        <div>
+                            <div class="ta-name">Tunde Okonkwo</div>
+                            <div class="ta-co">MD, Lagos Consumer Goods Group</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="testi-arrows">
+                <button class="ta-btn" onclick="slideT(-1)">←</button>
+                <button class="ta-btn" onclick="slideT(1)">→</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════ CONTACT ══════════════ -->
+    <section id="contact">
+        <div class="contact-l">
+            <div class="tag" style="background:rgba(232,82,10,0.12);border-color:rgba(232,82,10,0.2)">
+                <div class="tag-dot"></div>
+                <span style="color:var(--orange)">Get In Touch</span>
+            </div>
+            <h2 class="big fade-in d1" style="color:white;margin-top:18px">LET'S MOVE<br><span class="o">YOUR
+                    CARGO</span></h2>
+            <p class="body-txt fade-in d2" style="color:rgba(255,255,255,0.5)">Ready to streamline your supply chain?
+                Our team is available 24/7, 365 days a year. Reach us by phone, email, or fill in the form.</p>
+
+            <div class="contact-deets fade-in d3">
+                <div class="cd-item">
+                    <div class="cd-icon">📍</div>
+                    <div>
+                        <div class="cd-l">Head Office</div>
+                        <div class="cd-v">6, Adebayo Omolade Close, Meiran Alimosho,<br>Lagos, Nigeria, West Africa
+                        </div>
+                    </div>
+                </div>
+                <div class="cd-item">
+                    <div class="cd-icon">📞</div>
+                    <div>
+                        <div class="cd-l">Phone</div>
+                        <div class="cd-v">+234 01-8435 323<br>+234 809 7368 576</div>
+                    </div>
+                </div>
+                <div class="cd-item">
+                    <div class="cd-icon">✉️</div>
+                    <div>
+                        <div class="cd-l">Email</div>
+                        <div class="cd-v">ngjswift@yahoo.com</div>
+                    </div>
+                </div>
+                <div class="cd-item">
+                    <div class="cd-icon">🌐</div>
+                    <div>
+                        <div class="cd-l">Website</div>
+                        <div class="cd-v">ngjswiftlogisticltd.com</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="contact-form-card fade-in d2">
+            <div id="cForm">
+                <div class="cfc-ttl">Send Us a Message</div>
+                <div class="cfc-sub">We'll respond within 24 hours with a full assessment.</div>
+
+                <div class="fg-row">
+                    <div class="fg">
+                        <label>First Name</label>
+                        <input type="text" placeholder="John">
+                    </div>
+                    <div class="fg">
+                        <label>Last Name</label>
+                        <input type="text" placeholder="Doe">
+                    </div>
+                </div>
+                <div class="fg">
+                    <label>Email Address</label>
+                    <input type="email" placeholder="john@company.com">
+                </div>
+                <div class="fg">
+                    <label>Company Name</label>
+                    <input type="text" placeholder="Your Company Ltd">
+                </div>
+                <div class="fg">
+                    <label>Service Required</label>
+                    <select>
+                        <option value="">Select a service...</option>
+                        <option>Land Transportation</option>
+                        <option>Ocean Freight</option>
+                        <option>Air Freight</option>
+                        <option>Warehousing & Distribution</option>
+                        <option>Global Logistics</option>
+                        <option>Project Cargo</option>
+                    </select>
+                </div>
+                <div class="fg">
+                    <label>Message / Shipment Details</label>
+                    <textarea
+                        placeholder="Describe your shipment requirements, origin, destination, timeline..."></textarea>
+                </div>
+                <button class="btn-send" onclick="sendMsg(this)">
+                    Send Message
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5">
+                        <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                </button>
+            </div>
+            <div class="success-msg" id="cSuccess">
+                <div class="sm-icon">🎉</div>
+                <h3>Message Sent!</h3>
+                <p>Thank you for reaching out. Our team will review your request and respond within 24 hours.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════ FOOTER ══════════════ -->
+    <footer>
+        <div class="footer-top">
+            <div class="ft-brand">
+                <div class="nav-logo" style="margin-bottom:4px">
+                    <div
+                        style="width:40px;height:40px;background:#1A2E4A;border-radius:50%;position:relative;flex-shrink:0">
+                        <div
+                            style="position:absolute;bottom:0;right:0;width:16px;height:16px;background:var(--orange);border-radius:50% 0 0 0">
+                        </div>
+                    </div>
+                    <div class="logo-wordmark">
+                        <div class="logo-nm">NG & J SWIFT</div>
+                        <div class="logo-tag">Haulage & Logistics Limited</div>
+                    </div>
+                </div>
+                <p class="ft-desc">International air, sea, and land-based logistics built for West Africa and beyond.
+                    Your trusted 3PL partner since 2013.</p>
+                <div class="ft-social">
+                    <a href="#" class="social-btn" title="LinkedIn">in</a>
+                    <a href="#" class="social-btn" title="Twitter">𝕏</a>
+                    <a href="#" class="social-btn" title="Facebook">f</a>
+                    <a href="#" class="social-btn" title="WhatsApp">W</a>
+                </div>
+            </div>
+
+            <div class="ft-col">
+                <div class="ft-col-ttl">Company</div>
+                <ul>
+                    <li><a href="#about">About Us</a></li>
+                    <li><a href="#vmv">Vision & Mission</a></li>
+                    <li><a href="#team">Executive Team</a></li>
+                    <li><a href="#network">SHERQ</a></li>
+                </ul>
+            </div>
+
+            <div class="ft-col">
+                <div class="ft-col-ttl">Services</div>
+                <ul>
+                    <li><a href="#services">Land Transport</a></li>
+                    <li><a href="#services">Ocean Freight</a></li>
+                    <li><a href="#services">Air Freight</a></li>
+                    <li><a href="#services">Warehousing</a></li>
+                    <li><a href="#services">Project Cargo</a></li>
+                </ul>
+            </div>
+
+            <div class="ft-col">
+                <div class="ft-col-ttl">Contact</div>
+                <ul>
+                    <li><a href="tel:+2340184353230">+234 01-8435 323</a></li>
+                    <li><a href="tel:+2348097368576">+234 809 7368 576</a></li>
+                    <li><a href="mailto:ngjswift@yahoo.com">ngjswift@yahoo.com</a></li>
+                    <li><a href="#">ngjswiftlogisticltd.com</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bot">
+            <div class="fb-copy">© 2025 NG & J Swift Haulage & Logistics Limited. All rights reserved.</div>
+            <div class="fb-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Sitemap</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating CTA -->
+    <a href="#contact" class="float-cta" id="floatCTA">
+        <span class="float-icon">🚚</span>
+        <span class="cta-label">Get a Quote</span>
+    </a>
+
+    <!-- Back to top -->
+    <a href="#hero" id="btt">↑</a>
+
+    <!-- ══════════════════════════════════════
+  JAVASCRIPT
+══════════════════════════════════════ -->
+    <script>
+        /* ── LOADER ── */
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loader').classList.add('done');
+            }, 1800);
+        });
+
+        /* ── CUSTOM CURSOR ── */
+        const cur = document.getElementById('cur');
+        const curR = document.getElementById('curR');
+        let mx = 0, my = 0, rx = 0, ry = 0;
+
+        document.addEventListener('mousemove', e => {
+            mx = e.clientX; my = e.clientY;
+            cur.style.left = mx + 'px'; cur.style.top = my + 'px';
+        });
+
+        // Ring follows with lag
+        (function lerpRing() {
+            rx += (mx - rx) * 0.12;
+            ry += (my - ry) * 0.12;
+            curR.style.left = rx + 'px'; curR.style.top = ry + 'px';
+            requestAnimationFrame(lerpRing);
+        })();
+
+        document.querySelectorAll('a, button, .stab, .ta-btn').forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                cur.style.width = '20px'; cur.style.height = '20px';
+                curR.style.width = '56px'; curR.style.height = '56px';
+            });
+            el.addEventListener('mouseleave', () => {
+                cur.style.width = '10px'; cur.style.height = '10px';
+                curR.style.width = '36px'; curR.style.height = '36px';
+            });
+        });
+
+        /* ── SCROLL EFFECTS ── */
+        const sbar = document.getElementById('sbar');
+        const nav = document.getElementById('nav');
+        const btt = document.getElementById('btt');
+        const floatCTA = document.getElementById('floatCTA');
+
+        window.addEventListener('scroll', () => {
+            const sc = window.scrollY;
+            const total = document.documentElement.scrollHeight - window.innerHeight;
+            sbar.style.transform = `scaleX(${sc / total})`;
+            nav.classList.toggle('scrolled', sc > 40);
+            btt.classList.toggle('show', sc > 500);
+            floatCTA.classList.toggle('show', sc > 500);
+        });
+
+        /* ── INTERSECTION OBSERVER ── */
+        const obs = new IntersectionObserver(entries => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.classList.add('visible');
+                    obs.unobserve(e.target);
+                }
+            });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+
+        /* ── STAT COUNTERS ── */
+        function countUp(el, target, duration = 1600) {
+            let start = 0;
+            const step = timestamp => {
+                if (!start) start = timestamp;
+                const prog = Math.min((timestamp - start) / duration, 1);
+                const val = Math.floor(prog * target);
+                el.textContent = val;
+                if (prog < 1) requestAnimationFrame(step);
+                else el.textContent = target;
+            };
+            requestAnimationFrame(step);
+        }
+
+        const cntObs = new IntersectionObserver(entries => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    document.querySelectorAll('.cnt').forEach(c => {
+                        countUp(c, parseInt(c.dataset.target));
+                    });
+                    cntObs.disconnect();
+                }
+            });
+        }, { threshold: 0.3 });
+        const ss = document.getElementById('stats-strip');
+        if (ss) cntObs.observe(ss);
+
+        /* ── PROCESS LINE ANIMATION ── */
+        const procObs = new IntersectionObserver(entries => {
+            if (entries[0].isIntersecting) {
+                document.getElementById('procFill').style.width = '100%';
+                document.querySelectorAll('.ps').forEach((el, i) => {
+                    setTimeout(() => el.classList.add('active'), i * 240);
+                });
+                procObs.disconnect();
+            }
+        }, { threshold: 0.2 });
+        const proc = document.getElementById('process');
+        if (proc) procObs.observe(proc);
+
+        /* ── MOBILE NAV ── */
+        const burger = document.getElementById('burger');
+        const mmenu = document.getElementById('mmenu');
+        let navOpen = false;
+
+        function toggleNav() {
+            navOpen = !navOpen;
+            burger.classList.toggle('open', navOpen);
+            mmenu.classList.toggle('open', navOpen);
+        }
+        function closeNav() {
+            navOpen = false;
+            burger.classList.remove('open');
+            mmenu.classList.remove('open');
+        }
+
+        /* ── SERVICE FILTER ── */
+        function filterSvc(cat, btn) {
+            document.querySelectorAll('.stab').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.querySelectorAll('.sc').forEach(card => {
+                const cardCat = card.dataset.cat || '';
+                if (cat === 'all' || cardCat === cat) {
+                    card.style.opacity = '1';
+                    card.style.transform = '';
+                    card.style.pointerEvents = '';
+                } else {
+                    card.style.opacity = '0.25';
+                    card.style.transform = 'scale(0.97)';
+                    card.style.pointerEvents = 'none';
+                }
+            });
+        }
+
+        /* ── TESTIMONIAL SLIDER ── */
+        const track = document.getElementById('testiTrack');
+        let testiX = 0;
+        const CARD_W = 404; // card width + gap
+
+        function slideT(dir) {
+            const maxScroll = track.scrollWidth - track.offsetWidth;
+            testiX = Math.max(0, Math.min(testiX + dir * CARD_W, maxScroll));
+            track.scrollTo({ left: testiX, behavior: 'smooth' });
+        }
+
+        /* ── QUOTE CALCULATOR ── */
+        const rates = {
+            land: { perKg: 180, min: 15000, time: '1-3 days' },
+            ocean: { perKg: 65, min: 80000, time: '7-21 days' },
+            air: { perKg: 850, min: 50000, time: '1-5 days' },
+            warehouse: { perKg: 40, min: 25000, time: 'Flexible' },
+        };
+
+        function calcQuote() {
+            const svc = document.getElementById('cSvc').value;
+            const weight = parseFloat(document.getElementById('cWeight').value) || 0;
+            const out = document.getElementById('calcOut');
+            const price = document.getElementById('calcPrice');
+            const time = document.getElementById('calcTime');
+
+            if (!svc || !weight) {
+                alert('Please select a service type and enter cargo weight.');
+                return;
+            }
+            const r = rates[svc];
+            const base = Math.max(weight * r.perKg, r.min);
+            const lo = Math.round(base * 0.85 / 1000) * 1000;
+            const hi = Math.round(base * 1.2 / 1000) * 1000;
+            price.textContent = `₦${lo.toLocaleString()} – ₦${hi.toLocaleString()}`;
+            time.textContent = r.time;
+            out.classList.add('show');
+        }
+
+        /* ── CONTACT FORM ── */
+        function sendMsg(btn) {
+            btn.textContent = 'Sending...';
+            btn.style.opacity = '0.65';
+            setTimeout(() => {
+                document.getElementById('cForm').style.display = 'none';
+                const s = document.getElementById('cSuccess');
+                s.style.display = 'block';
+            }, 1600);
+        }
+    </script>
+</body>
+
+</html>
