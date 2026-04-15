@@ -178,17 +178,6 @@
             text-decoration: none;
         }
 
-        .logo-emblem {
-            position: relative;
-            width: 44px;
-            height: 44px;
-        }
-
-        .logo-emblem svg {
-            width: 44px;
-            height: 44px;
-        }
-
         .logo-wordmark {
             line-height: 1.1;
         }
@@ -579,6 +568,24 @@
         .hero-l h1 .accent-i {
             font-family: 'DM Serif Display', serif;
             font-style: italic;
+            display: inline-flex;
+            align-items: baseline;
+            gap: 3px;
+        }
+
+        .hero-caret {
+            display: inline-block;
+            width: 4px;
+            background: var(--orange);
+            border-radius: 2px;
+            height: 0.85em;
+            vertical-align: baseline;
+            animation: caretBlink 0.9s step-end infinite;
+        }
+
+        @keyframes caretBlink {
+            0%, 100% { opacity: 1; }
+            50%       { opacity: 0; }
         }
 
         .hero-tagline {

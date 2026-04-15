@@ -183,3 +183,53 @@
                 s.style.display = 'block';
             }, 1600);
         }
+
+        /* ── HERO TYPEWRITER ── */
+        (function heroTypewriter() {
+            const words = ['LOAD.', 'SHIPMENT.', 'DELIVERY.', 'CARGO.'];
+            const el = document.getElementById('heroWord');
+            if (!el) return;
+
+            let wordIdx = 0;
+            let charIdx = 0;
+            let deleting = false;
+
+            const TYPE_SPEED  = 110;  // ms per character typed
+            const DEL_SPEED   = 60;   // ms per character deleted
+            const PAUSE_END   = 1800; // pause after full word is typed
+            const PAUSE_START = 300;  // pause before typing next word
+
+            function tick() {
+                const current = words[wordIdx];
+
+                if (!deleting) {
+                    // Typing forward
+                    charIdx++;
+                    el.textContent = current.slice(0, charIdx);
+
+                    if (charIdx === current.length) {
+                        // Word fully typed — pause then delete
+                        deleting = true;
+                        setTimeout(tick, PAUSE_END);
+                        return;
+                    }
+                    setTimeout(tick, TYPE_SPEED);
+                } else {
+                    // Deleting backward
+                    charIdx--;
+                    el.textContent = current.slice(0, charIdx);
+
+                    if (charIdx === 0) {
+                        // Word fully deleted — move to next word and pause
+                        deleting = false;
+                        wordIdx = (wordIdx + 1) % words.length;
+                        setTimeout(tick, PAUSE_START);
+                        return;
+                    }
+                    setTimeout(tick, DEL_SPEED);
+                }
+            }
+
+            // Start after the page loader clears (~1.8 s) + a small extra delay
+            setTimeout(tick, 2200);
+        })();
