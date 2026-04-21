@@ -97,6 +97,10 @@
       <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
       Services
     </a>
+    <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-silver" data-section="enhanced-services">
+      <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 7h18M6 3h12a1 1 0 011 1v16a1 1 0 01-1 1H6a1 1 0 01-1-1V4a1 1 0 011-1z"/><path d="M8 12h8M8 16h5"/></svg>
+      Enhanced Services
+    </a>
     <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-silver" data-section="team">
       <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
       Team
@@ -188,7 +192,7 @@
     <div id="sec-services" class="section">
       <div class="flex items-center justify-between mb-6">
         <h2 class="font-semibold text-lg">Services</h2>
-        <button onclick="openModal('service')" class="flex items-center gap-2 bg-orange hover:bg-orange-lt text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all hover:-translate-y-0.5">
+        <button id="openServiceBtn" onclick="openModal('service')" class="flex items-center gap-2 bg-orange hover:bg-orange-lt text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all hover:-translate-y-0.5">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           Add Service
         </button>
@@ -199,11 +203,38 @@
             <thead><tr class="border-b border-navy-lt text-silver text-xs uppercase tracking-widest">
               <th class="text-left px-5 py-3.5 font-medium">Title</th>
               <th class="text-left px-5 py-3.5 font-medium">Category</th>
+              <th class="text-left px-5 py-3.5 font-medium">Enhanced</th>
               <th class="text-left px-5 py-3.5 font-medium">Order</th>
               <th class="text-left px-5 py-3.5 font-medium">Status</th>
               <th class="text-right px-5 py-3.5 font-medium">Actions</th>
             </tr></thead>
-            <tbody id="servicesBody"><tr><td colspan="5" class="text-center py-10 text-silver text-sm">Loading…</td></tr></tbody>
+            <tbody id="servicesBody"><tr><td colspan="6" class="text-center py-10 text-silver text-sm">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── ENHANCED SERVICES ─── -->
+    <div id="sec-enhanced-services" class="section">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="font-semibold text-lg">Enhanced Services</h2>
+        <button id="openEnhancedServiceBtn" onclick="openModal('service')" class="flex items-center gap-2 bg-orange hover:bg-orange-lt text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all hover:-translate-y-0.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Enhanced Service
+        </button>
+      </div>
+      <p class="text-silver text-sm mb-5">Only services marked as enhanced will appear on the Service Enhancements page.</p>
+      <div class="bg-navy-mid border border-navy-lt rounded-2xl overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead><tr class="border-b border-navy-lt text-silver text-xs uppercase tracking-widest">
+              <th class="text-left px-5 py-3.5 font-medium">Title</th>
+              <th class="text-left px-5 py-3.5 font-medium">Category</th>
+              <th class="text-left px-5 py-3.5 font-medium">Order</th>
+              <th class="text-left px-5 py-3.5 font-medium">Status</th>
+              <th class="text-right px-5 py-3.5 font-medium">Actions</th>
+            </tr></thead>
+            <tbody id="enhancedServicesBody"><tr><td colspan="5" class="text-center py-10 text-silver text-sm">Loading…</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -323,6 +354,10 @@
         <div class="flex items-center gap-2">
           <input type="checkbox" id="svc-wide" class="w-auto" style="width:16px;height:16px;" />
           <label class="mb-0 normal-case tracking-normal text-sm text-silver" for="svc-wide">Wide card</label>
+        </div>
+        <div class="flex items-center gap-2">
+          <input type="checkbox" id="svc-enhanced" class="w-auto" style="width:16px;height:16px;" />
+          <label class="mb-0 normal-case tracking-normal text-sm text-silver" for="svc-enhanced">Show on Enhanced Services page</label>
         </div>
         <div class="flex items-center gap-2">
           <input type="checkbox" id="svc-active" class="w-auto" style="width:16px;height:16px;" checked />
@@ -465,7 +500,7 @@ async function api(method, url, body = null, isFormData = false) {
 const sideLinks = document.querySelectorAll('.sidebar-link');
 const sections  = document.querySelectorAll('.section');
 const pageTitle = document.getElementById('pageTitle');
-const titles    = { overview:'Overview', projects:'Projects', services:'Services', team:'Team Members', testimonials:'Testimonials' };
+const titles    = { overview:'Overview', projects:'Projects', services:'Services', 'enhanced-services':'Enhanced Services', team:'Team Members', testimonials:'Testimonials' };
 
 sideLinks.forEach(link => {
   link.addEventListener('click', e => {
@@ -542,6 +577,7 @@ loadStats();
 function loadSection(s) {
   if (s === 'projects')     loadProjects();
   if (s === 'services')     loadServices();
+  if (s === 'enhanced-services') loadEnhancedServices();
   if (s === 'team')         loadTeam();
   if (s === 'testimonials') loadTestimonials();
 }
@@ -637,11 +673,38 @@ document.getElementById('form-project').addEventListener('submit', async e => {
 // ═══════════════════════════════════════
 async function loadServices() {
   const tbody = document.getElementById('servicesBody');
-  tbody.innerHTML = '<tr><td colspan="5" class="text-center py-10 text-silver text-sm">Loading…</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="6" class="text-center py-10 text-silver text-sm">Loading…</td></tr>';
   const res  = await api('GET', '/api/services/all');
   if (!res) return;
   const data = await res.json();
-  if (!data.length) { tbody.innerHTML = '<tr><td colspan="5" class="text-center py-10 text-silver text-sm">No services yet.</td></tr>'; return; }
+  if (!data.length) { tbody.innerHTML = '<tr><td colspan="6" class="text-center py-10 text-silver text-sm">No services yet.</td></tr>'; return; }
+  tbody.innerHTML = data.map(s => `
+    <tr class="border-b border-navy-lt/50">
+      <td class="px-5 py-3.5 font-medium">${esc(s.title)}</td>
+      <td class="px-5 py-3.5 text-silver">${esc(s.category)}</td>
+      <td class="px-5 py-3.5">${s.enhanced ? '<span class="badge-active">Yes</span>' : '<span class="badge-inactive">No</span>'}</td>
+      <td class="px-5 py-3.5 text-silver">${s.order}</td>
+      <td class="px-5 py-3.5">${s.active ? '<span class="badge-active">Active</span>' : '<span class="badge-inactive">Hidden</span>'}</td>
+      <td class="px-5 py-3.5 text-right">
+        <button onclick="editService('${s._id}')" class="text-silver hover:text-white text-xs px-3 py-1.5 rounded-lg border border-navy-lt hover:border-silver transition-all mr-2">Edit</button>
+        <button onclick="confirmDelete('service','${s._id}')" class="text-red-400 hover:text-red-300 text-xs px-3 py-1.5 rounded-lg border border-red-500/20 hover:border-red-400/50 transition-all">Delete</button>
+      </td>
+    </tr>`).join('');
+}
+
+async function loadEnhancedServices() {
+  const tbody = document.getElementById('enhancedServicesBody');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="5" class="text-center py-10 text-silver text-sm">Loading…</td></tr>';
+  const res = await api('GET', '/api/services/all');
+  if (!res) return;
+  const all = await res.json();
+  const data = all.filter(s => s.enhanced);
+  if (!data.length) {
+    tbody.innerHTML = '<tr><td colspan="5" class="text-center py-10 text-silver text-sm">No enhanced services yet.</td></tr>';
+    return;
+  }
+
   tbody.innerHTML = data.map(s => `
     <tr class="border-b border-navy-lt/50">
       <td class="px-5 py-3.5 font-medium">${esc(s.title)}</td>
@@ -660,8 +723,9 @@ function resetServiceForm() {
     const el = document.getElementById(id); if (el) el.value = '';
   });
   document.getElementById('svc-order').value  = '0';
-  document.getElementById('svc-wide').checked   = false;
-  document.getElementById('svc-active').checked = true;
+  document.getElementById('svc-wide').checked     = false;
+  document.getElementById('svc-enhanced').checked = false;
+  document.getElementById('svc-active').checked   = true;
   document.getElementById('svc-err').classList.add('hidden');
 }
 
@@ -678,16 +742,11 @@ async function editService(id) {
   document.getElementById('svc-description').value = s.description;
   document.getElementById('svc-order').value       = s.order;
   document.getElementById('svc-wide').checked      = s.wide;
+  document.getElementById('svc-enhanced').checked  = !!s.enhanced;
   document.getElementById('svc-active').checked    = s.active;
   document.getElementById('service-modal-title').textContent = 'Edit Service';
   openModal('service');
 }
-
-document.getElementById('modal-service').querySelector('button[onclick*="Add"]') // fix title on open
-document.querySelector('[onclick="openModal(\'service\')"]')?.addEventListener('click', () => {
-  resetServiceForm();
-  document.getElementById('service-modal-title').textContent = 'Add Service';
-});
 
 document.getElementById('form-service').addEventListener('submit', async e => {
   e.preventDefault();
@@ -703,6 +762,7 @@ document.getElementById('form-service').addEventListener('submit', async e => {
   fd.append('description', document.getElementById('svc-description').value.trim());
   fd.append('order',       document.getElementById('svc-order').value);
   fd.append('wide',        document.getElementById('svc-wide').checked);
+  fd.append('enhanced',    document.getElementById('svc-enhanced').checked);
   fd.append('active',      document.getElementById('svc-active').checked);
   const imgFile = document.getElementById('svc-image').files[0];
   if (imgFile) fd.append('image', imgFile);
@@ -714,7 +774,7 @@ document.getElementById('form-service').addEventListener('submit', async e => {
     const d = await res.json();
     errEl.textContent = d.error || 'Failed to save.'; errEl.classList.remove('hidden'); return;
   }
-  closeModal('service'); resetServiceForm(); loadServices(); loadStats();
+  closeModal('service'); resetServiceForm(); loadServices(); loadEnhancedServices(); loadStats();
   showToast(id ? 'Service updated!' : 'Service added!');
 });
 
@@ -888,7 +948,12 @@ function confirmDelete(type, id) {
 }
 
 const endpointMap = { project:'projects', service:'services', team:'team', testimonial:'testimonials' };
-const reloaderMap = { project:loadProjects, service:loadServices, team:loadTeam, testimonial:loadTestimonials };
+const reloaderMap = {
+  project: loadProjects,
+  service: () => { loadServices(); loadEnhancedServices(); },
+  team: loadTeam,
+  testimonial: loadTestimonials
+};
 
 document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
   if (!_deleteTarget) return;
@@ -918,9 +983,16 @@ document.querySelector('[onclick="openModal(\'testimonial\')"]')?.addEventListen
   resetTestimonialForm();
   document.getElementById('testimonial-modal-title').textContent = 'Add Testimonial';
 });
-document.querySelector('[onclick="openModal(\'service\')"]')?.addEventListener('click', () => {
+document.getElementById('openServiceBtn')?.addEventListener('click', () => {
   resetServiceForm();
+  document.getElementById('svc-enhanced').checked = false;
   document.getElementById('service-modal-title').textContent = 'Add Service';
+});
+
+document.getElementById('openEnhancedServiceBtn')?.addEventListener('click', () => {
+  resetServiceForm();
+  document.getElementById('svc-enhanced').checked = true;
+  document.getElementById('service-modal-title').textContent = 'Add Enhanced Service';
 });
 
 // ─── LOGOUT ───

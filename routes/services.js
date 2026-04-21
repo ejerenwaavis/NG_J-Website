@@ -31,6 +31,7 @@ router.post('/', auth, upload.single('image'), async (req, res) => {
     const data = { ...req.body };
     if (req.file) data.image = '/uploads/' + req.file.filename;
     data.wide   = data.wide   === 'true' || data.wide   === true;
+    data.enhanced = data.enhanced === 'true' || data.enhanced === true;
     data.active = data.active !== 'false' && data.active !== false;
     const s = await Service.create(data);
     res.status(201).json(s);
@@ -45,6 +46,7 @@ router.put('/:id', auth, upload.single('image'), async (req, res) => {
     const data = { ...req.body };
     if (req.file) data.image = '/uploads/' + req.file.filename;
     data.wide   = data.wide   === 'true' || data.wide   === true;
+    data.enhanced = data.enhanced === 'true' || data.enhanced === true;
     data.active = data.active !== 'false' && data.active !== false;
     const s = await Service.findByIdAndUpdate(req.params.id, data, { new: true, runValidators: true });
     if (!s) return res.status(404).json({ error: 'Not found' });

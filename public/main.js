@@ -60,7 +60,158 @@
         }, { threshold: 0.1 });
         document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
 
+        function esc(v) {
+            return String(v || '').replace(/[&<>'"]/g, m => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                "'": '&#39;',
+                '"': '&quot;'
+            }[m]));
+        }
+
+        function observeNewFadeIns() {
+            document.querySelectorAll('.fade-in').forEach(el => {
+                if (!el.classList.contains('visible')) obs.observe(el);
+            });
+        }
+
+        function renderStars(rating) {
+            const safeRating = Math.max(1, Math.min(5, Number(rating) || 5));
+            return '★'.repeat(safeRating);
+        }
+
+        async function loadServices() {
+            const grid = document.getElementById('svcGrid');
+            if (!grid) return;
+
+            try {
+                const res = await fetch('/api/services');
+                if (!res.ok) throw new Error('Failed to load services');
+                const allServices = await res.json();
+                const services = allServices.filter(s => {
+                    const cat = (s.category || '').toLowerCase();
+                    return !s.enhanced && !['storage', 'project'].includes(cat);
+                });
+
+                if (!services.length) {
+                    grid.innerHTML = '<p class="body-txt">Service details will be updated shortly.</p>';
+                    return;
+                }
+
+                grid.innerHTML = services.map((s, idx) => {
+                    const cardClass = `sc ${s.wide ? 'wide' : ''} fade-in d${Math.min(idx + 1, 4)}`.trim();
+                    return `
+                        <div class="${cardClass}">
+                            <div class="sc-img" style="background-image:url('${esc(s.image)}')">
+                                <span class="sc-chip">${esc(s.chip || 'Service')}</span>
+                            </div>
+                            <div class="sc-body">
+                                <div class="sc-ttl">${esc(s.title)}</div>
+                                <div class="sc-desc">${esc(s.description)}</div>
+                                <a href="#contact" class="sc-link">Request Service
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                        <path d="M5 12h14M12 5l7 7-7 7" />
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                observeNewFadeIns();
+            } catch (err) {
+                grid.innerHTML = '<p class="body-txt">Unable to load services right now.</p>';
+            }
+        }
+
+        async function loadTeam() {
+            const teamGrid = document.getElementById('teamGrid');
+            if (!teamGrid) return;
+
+            try {
+                const res = await fetch('/api/team');
+                if (!res.ok) throw new Error('Failed to load team');
+                const members = await res.json();
+
+                if (!members.length) {
+                    teamGrid.innerHTML = '<p class="body-txt">Team details will be updated shortly.</p>';
+                    return;
+                }
+
+                teamGrid.innerHTML = members.map((m, idx) => `
+                    <div class="tc fade-in d${Math.min(idx, 4)}">
+                        <div class="tc-av" style="background:${esc(m.gradient || 'linear-gradient(135deg,#1A2E4A,#233A5C)')}">${esc(m.initials)}</div>
+                        <div class="tc-nm">${esc(m.name)}</div>
+                        <div class="tc-role">${esc(m.role)}</div>
+                        <div class="tc-bio">${esc(m.bio)}</div>
+                    </div>
+                `).join('');
+
+                observeNewFadeIns();
+            } catch (err) {
+                teamGrid.innerHTML = '<p class="body-txt">Unable to load team right now.</p>';
+            }
+        }
+
+        async function loadTestimonials() {
+            const testimonialsTrack = document.getElementById('testiTrack');
+            if (!testimonialsTrack) return;
+
+            try {
+                const res = await fetch('/api/testimonials');
+                if (!res.ok) throw new Error('Failed to load testimonials');
+                const testimonials = await res.json();
+
+                if (!testimonials.length) {
+                    testimonialsTrack.innerHTML = '<p class="body-txt">Client testimonials will be updated shortly.</p>';
+                    return;
+                }
+
+                testimonialsTrack.innerHTML = testimonials.map((t, idx) => `
+                    <div class="tcard fade-in d${Math.min(idx, 4)}">
+                        <div class="tcard-quote">"</div>
+                        <div class="stars">${renderStars(t.rating)}</div>
+                        <div class="tcard-text">${esc(t.text)}</div>
+                        <div class="tcard-author">
+                            <div class="ta-av" style="background:${esc(t.color || 'linear-gradient(135deg,#E8520A,#FF6B2B)')}">${esc(t.initials)}</div>
+                            <div>
+                                <div class="ta-name">${esc(t.name)}</div>
+                                <div class="ta-co">${esc(t.role || 'Client')}, ${esc(t.company || 'NG&J Client')}</div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+                observeNewFadeIns();
+            } catch (err) {
+                testimonialsTrack.innerHTML = '<p class="body-txt">Unable to load testimonials right now.</p>';
+            }
+        }
+
         /* ── STAT COUNTERS ── */
+        function getYearsInOperation(foundedYear = 2013) {
+            const currentYear = new Date().getFullYear();
+            return Math.max(0, currentYear - foundedYear);
+        }
+
+        function applyDynamicYearCounters() {
+            const years = getYearsInOperation(2013);
+
+            const heroYears = document.getElementById('k1');
+            if (heroYears) {
+                heroYears.dataset.target = String(years);
+                heroYears.textContent = String(years);
+            }
+
+            const yearsExpCounter = document.getElementById('yearsExpCnt');
+            if (yearsExpCounter) {
+                yearsExpCounter.dataset.target = String(years);
+            }
+        }
+
+        applyDynamicYearCounters();
+
         function countUp(el, target, duration = 1600) {
             let start = 0;
             const step = timestamp => {
@@ -116,30 +267,13 @@
             mmenu.classList.remove('open');
         }
 
-        /* ── SERVICE FILTER ── */
-        function filterSvc(cat, btn) {
-            document.querySelectorAll('.stab').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            document.querySelectorAll('.sc').forEach(card => {
-                const cardCat = card.dataset.cat || '';
-                if (cat === 'all' || cardCat === cat) {
-                    card.style.opacity = '1';
-                    card.style.transform = '';
-                    card.style.pointerEvents = '';
-                } else {
-                    card.style.opacity = '0.25';
-                    card.style.transform = 'scale(0.97)';
-                    card.style.pointerEvents = 'none';
-                }
-            });
-        }
-
         /* ── TESTIMONIAL SLIDER ── */
         const track = document.getElementById('testiTrack');
         let testiX = 0;
         const CARD_W = 404; // card width + gap
 
         function slideT(dir) {
+            if (!track) return;
             const maxScroll = track.scrollWidth - track.offsetWidth;
             testiX = Math.max(0, Math.min(testiX + dir * CARD_W, maxScroll));
             track.scrollTo({ left: testiX, behavior: 'smooth' });
@@ -148,10 +282,14 @@
         /* ── QUOTE CALCULATOR ── */
         const rates = {
             land: { perKg: 180, min: 15000, time: '1-3 days' },
-            ocean: { perKg: 65, min: 80000, time: '7-21 days' },
-            air: { perKg: 850, min: 50000, time: '1-5 days' },
             warehouse: { perKg: 40, min: 25000, time: 'Flexible' },
         };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadServices();
+            loadTeam();
+            loadTestimonials();
+        });
 
         function calcQuote() {
             const svc = document.getElementById('cSvc').value;
@@ -186,7 +324,7 @@
 
         /* ── HERO TYPEWRITER ── */
         (function heroTypewriter() {
-            const words = ['LOAD.', 'SHIPMENT.', 'DELIVERY.', 'CARGO.'];
+            const words = ['LOAD.', 'DELIVERY.'];
             const el = document.getElementById('heroWord');
             if (!el) return;
 

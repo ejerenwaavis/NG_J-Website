@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Enhancements | NG & J Swift Haulage & Logistics Limited</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Sora:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/uicons-thin-rounded/css/uicons-thin-rounded.css'>
+</head>
+
+<body>
+    <div class="cursor" id="cur"></div>
+    <div class="cursor-ring" id="curR"></div>
+
+    <nav id="nav" class="scrolled">
+        <a href="/" class="nav-logo">
+            <div class="logo-wordmark">
+                <div class="logo-nm">NG & J SWIFT</div>
+                <div class="logo-tag">Haulage & Logistics Limited</div>
+            </div>
+        </a>
+
+        <ul class="nav-center">
+            <li><a href="/#about">About</a></li>
+            <li><a href="/#services">Services</a></li>
+            <li><a href="/#process">Process</a></li>
+            <li><a href="/#team">Team</a></li>
+            <li><a href="/#testimonials">Clients</a></li>
+        </ul>
+
+        <div class="nav-right">
+            <a href="/#contact" class="btn-quote">
+                Get a Quote
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+            </a>
+        </div>
+    </nav>
+
+    <section id="services" style="padding-top:160px;min-height:100vh">
+        <div class="svc-header svc-header-stack">
+            <div>
+                <div class="tag fade-in visible">
+                    <div class="tag-dot"></div>Our Growing Capabilities
+                </div>
+                <h1 class="big" style="margin-top:18px">SERVICE <span class="o">ENHANCEMENTS</span></h1>
+            </div>
+            <p class="body-txt">Explore our extended support capabilities for warehousing and freight operations across
+                Nigeria, including flexible storage, distribution, and high-demand cargo movement.</p>
+        </div>
+
+        <div class="values-ticker" style="margin:0 0 34px 0">
+            <div class="vtag"><span class="vtag-icon"><i class="fi fi-tr-box-open"></i></span> Warehousing</div>
+            <div class="vtag"><span class="vtag-icon"><i class="fi fi-tr-truck-moving"></i></span> Freight Support</div>
+            <div class="vtag"><span class="vtag-icon"><i class="fi fi-tr-chart-mixed"></i></span> Distribution</div>
+            <div class="vtag"><span class="vtag-icon"><i class="fi fi-tr-badge-check"></i></span> Reliable Handling</div>
+        </div>
+
+        <div class="svc-grid" id="enhancementsGrid"></div>
+
+        <p class="body-txt" style="margin-top:22px;text-align:center">
+            Need a custom warehousing or freight workflow? Our team can tailor an enhanced service package for your
+            operations.
+        </p>
+
+        <p class="body-txt" style="margin-top:10px;text-align:center">
+            <a href="/" class="sc-link">Return to Main Website
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+            </a>
+        </p>
+    </section>
+
+    <footer>
+        <div class="footer-top">
+            <div class="ft-brand">
+                <div class="nav-logo" style="margin-bottom:4px">
+                    <div class="logo-wordmark">
+                        <div class="logo-nm">NG & J SWIFT</div>
+                        <div class="logo-tag">Haulage & Logistics Limited</div>
+                    </div>
+                </div>
+                <p class="ft-desc">Nigeria's trusted nationwide haulage and logistics provider since 2013.
+                    Your reliable 3PL partner.</p>
+            </div>
+
+            <div class="ft-col">
+                <div class="ft-col-ttl">Company</div>
+                <ul>
+                    <li><a href="/#about">About Us</a></li>
+                    <li><a href="/#vmv">Vision & Mission</a></li>
+                    <li><a href="/#team">Executive Team</a></li>
+                    <li><a href="/#network">SHERQ</a></li>
+                </ul>
+            </div>
+
+            <div class="ft-col">
+                <div class="ft-col-ttl">Services</div>
+                <ul>
+                    <li><a href="/#services">Land Transport</a></li>
+                    <li><a href="/service-enhancements">Service Enhancements</a></li>
+                </ul>
+            </div>
+
+            <div class="ft-col">
+                <div class="ft-col-ttl">Contact</div>
+                <ul>
+                    <li><a href="tel:+2340184353230">+234 01-8435 323</a></li>
+                    <li><a href="tel:+2348097368576">+234 809 7368 576</a></li>
+                    <li><a href="mailto:ngjswift@yahoo.com">ngjswift@yahoo.com</a></li>
+                    <li><a href="#">ngjswiftlogisticltd.com</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bot">
+            <div class="fb-copy">© 2025 NG & J Swift Haulage & Logistics Limited. All rights reserved.</div>
+            <div class="fb-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Sitemap</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const cur = document.getElementById('cur');
+        const curR = document.getElementById('curR');
+        let mx = 0, my = 0, rx = 0, ry = 0;
+
+        document.addEventListener('mousemove', e => {
+            mx = e.clientX;
+            my = e.clientY;
+            cur.style.left = mx + 'px';
+            cur.style.top = my + 'px';
+        });
+
+        (function lerpRing() {
+            rx += (mx - rx) * 0.12;
+            ry += (my - ry) * 0.12;
+            curR.style.left = rx + 'px';
+            curR.style.top = ry + 'px';
+            requestAnimationFrame(lerpRing);
+        })();
+
+        document.querySelectorAll('a, button').forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                cur.style.width = '20px';
+                cur.style.height = '20px';
+                curR.style.width = '56px';
+                curR.style.height = '56px';
+            });
+            el.addEventListener('mouseleave', () => {
+                cur.style.width = '10px';
+                cur.style.height = '10px';
+                curR.style.width = '36px';
+                curR.style.height = '36px';
+            });
+        });
+
+        function esc(v) {
+            return String(v || '').replace(/[&<>'"]/g, m => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                "'": '&#39;',
+                '"': '&quot;'
+            }[m]));
+        }
+
+        async function loadEnhancements() {
+            const grid = document.getElementById('enhancementsGrid');
+            try {
+                const res = await fetch('/api/services');
+                if (!res.ok) throw new Error('Failed to load enhancements');
+                const services = await res.json();
+                let enhancements = services.filter(s => s.enhanced);
+                if (!enhancements.length) {
+                    enhancements = services.filter(s => {
+                        const cat = (s.category || '').toLowerCase();
+                        return ['storage', 'freight'].includes(cat);
+                    });
+                }
+
+                if (!enhancements.length) {
+                    grid.innerHTML = '<p class="body-txt">Service enhancements will be published here soon.</p>';
+                    return;
+                }
+
+                grid.innerHTML = enhancements.map((s, idx) => {
+                    const cardClass = `sc ${s.wide ? 'wide' : ''} fade-in d${Math.min(idx + 1, 4)}`.trim();
+                    return `
+                        <div class="${cardClass}">
+                            <div class="sc-img" style="background-image:url('${esc(s.image)}')">
+                                <span class="sc-chip">${esc(s.chip || 'Enhancement')}</span>
+                            </div>
+                            <div class="sc-body">
+                                <div class="sc-ttl">${esc(s.title)}</div>
+                                <div class="sc-desc">${esc(s.description)}</div>
+                                <a href="/#contact" class="sc-link">Request Details
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                        <path d="M5 12h14M12 5l7 7-7 7" />
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (err) {
+                grid.innerHTML = '<p class="body-txt">Unable to load enhancements right now.</p>';
+            }
+        }
+
+        loadEnhancements();
+    </script>
+</body>
+
+</html>

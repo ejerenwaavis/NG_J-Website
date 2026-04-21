@@ -689,7 +689,7 @@
         .hero-img-bg {
             position: absolute;
             inset: 0;
-            background: url('/img/ngj_bg.jpg') center/cover no-repeat;
+            background: url('/img/n&j land logistica.png') center/cover no-repeat;
         }
 
         .hero-img-bg::after {
@@ -1153,6 +1153,13 @@
             gap: 48px;
             align-items: flex-end;
             margin-bottom: 60px;
+        }
+
+        .svc-header-stack {
+            grid-template-columns: 1fr;
+            gap: 16px;
+            align-items: flex-start;
+            margin-bottom: 42px;
         }
 
         /* Filter tabs */
@@ -1675,7 +1682,7 @@
         .network-img-block>.nb-bg {
             position: absolute;
             inset: 0;
-            background: url('https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=800&q=80') center/cover;
+            background: url('/img/whys-us.png') center/cover;
         }
 
         .network-img-block::after {

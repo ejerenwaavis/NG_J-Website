@@ -7,6 +7,7 @@ const ServiceSchema = new Schema({
   description: { type: String, required: true },
   image:       { type: String },
   wide:        { type: Boolean, default: false },
+  enhanced:    { type: Boolean, default: false },
   order:       { type: Number, default: 0 },
   active:      { type: Boolean, default: true }
 }, { timestamps: true });
