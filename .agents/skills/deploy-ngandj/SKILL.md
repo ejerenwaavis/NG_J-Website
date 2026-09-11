@@ -21,7 +21,7 @@ Follow these exact steps in order when the user asks you to deploy or run the bu
    - Run `git push origin main`.
 3. **Deploy to Namecheap**:
    - Run SSH command to pull and restart the app on the remote server via configured `ngandj` SSH alias:
-     `ssh -o BatchMode=yes ngandj "source /home/ngankmnx/nodevenv/website/20/bin/activate && cd /home/ngankmnx/website && PREV_REV=$(git rev-parse HEAD) && git pull origin main && NEW_REV=$(git rev-parse HEAD) && CHANGED=$(git diff --name-only $PREV_REV $NEW_REV | grep package || true) && if [ -n \"$CHANGED\" ]; then echo \"Dependencies changed, running npm ci...\"; npm ci --omit=dev; fi && touch tmp/restart.txt"`
+     `ssh -o BatchMode=yes ngandj "source /home/ngankmnx/nodevenv/website/20/bin/activate && cd /home/ngankmnx/website && PREV_REV=$(git rev-parse HEAD) && git pull origin main && NEW_REV=$(git rev-parse HEAD) && if git diff --name-only $PREV_REV $NEW_REV | grep -q package; then echo \"Dependencies changed, running npm ci...\"; npm ci --omit=dev; fi && touch tmp/restart.txt"`
 4. **Verify**:
    - Verify live endpoint responds: `curl.exe -I -s https://ngandjswift.org`
    - Confirm to the user that the app has been safely checked, pushed, pulled, and restarted remotely on Namecheap.
