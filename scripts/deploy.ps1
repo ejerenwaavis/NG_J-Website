@@ -45,7 +45,7 @@ Write-Host "  [OK] Pushed to origin/main successfully." -ForegroundColor Green
 
 # 3. Remote Deployment via SSH
 Write-Host "`n[3/4] Pulling updates and restarting app on Namecheap..." -ForegroundColor Yellow
-$remoteCmd = 'source /home/ngankmnx/nodevenv/website/20/bin/activate && cd /home/ngankmnx/website && PREV_REV=$(git rev-parse HEAD) && git pull origin main && NEW_REV=$(git rev-parse HEAD) && CHANGED=$(git diff --name-only $PREV_REV $NEW_REV | grep package) && if [ -n "$CHANGED" ]; then echo "Dependencies updated, running npm ci..."; npm ci --omit=dev; fi && touch tmp/restart.txt && echo "Passenger restart triggered."'
+$remoteCmd = 'source /home/ngankmnx/nodevenv/website/20/bin/activate && cd /home/ngankmnx/website && PREV_REV=$(git rev-parse HEAD) && git pull origin main && NEW_REV=$(git rev-parse HEAD) && CHANGED=$(git diff --name-only $PREV_REV $NEW_REV | grep package || true) && if [ -n "$CHANGED" ]; then echo "Dependencies updated, running npm ci..."; npm ci --omit=dev; fi && touch tmp/restart.txt && echo "Passenger restart triggered."'
 
 ssh -o BatchMode=yes ngandj $remoteCmd
 if ($LASTEXITCODE -ne 0) {
