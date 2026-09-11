@@ -29,7 +29,9 @@ router.get('/all', auth, async (req, res) => {
 router.post('/', auth, upload.single('image'), async (req, res) => {
   try {
     const data = { ...req.body };
-    if (req.file) data.image = '/uploads/' + req.file.filename;
+    if (req.file) {
+      data.image = req.file.path || req.file.secure_url || req.file.url || ('/uploads/' + req.file.filename);
+    }
     data.wide   = data.wide   === 'true' || data.wide   === true;
     data.enhanced = data.enhanced === 'true' || data.enhanced === true;
     data.active = data.active !== 'false' && data.active !== false;
@@ -44,7 +46,9 @@ router.post('/', auth, upload.single('image'), async (req, res) => {
 router.put('/:id', auth, upload.single('image'), async (req, res) => {
   try {
     const data = { ...req.body };
-    if (req.file) data.image = '/uploads/' + req.file.filename;
+    if (req.file) {
+      data.image = req.file.path || req.file.secure_url || req.file.url || ('/uploads/' + req.file.filename);
+    }
     data.wide   = data.wide   === 'true' || data.wide   === true;
     data.enhanced = data.enhanced === 'true' || data.enhanced === true;
     data.active = data.active !== 'false' && data.active !== false;

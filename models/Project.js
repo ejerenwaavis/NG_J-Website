@@ -9,6 +9,7 @@ const ProjectSchema = new Schema({
   year:        { type: Number },
   image:       { type: String },
   featured:    { type: Boolean, default: false },
+  active:      { type: Boolean, default: true },
   tags:        [{ type: String }],
   createdAt:   { type: Date, default: Date.now }
 }, { timestamps: true });

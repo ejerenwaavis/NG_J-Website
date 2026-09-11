@@ -43,8 +43,9 @@
         <ul class="nav-center">
             <li><a href="#about">About</a></li>
             <li><a href="#services">Services</a></li>
+            <li id="navProjectsLink"><a href="#projects">Projects</a></li>
             <li><a href="#process">Process</a></li>
-            <!-- <li><a href="#team">Team</a></li> -->
+            <li id="navTeamLink"><a href="#team">Team</a></li>
             <li><a href="#testimonials">Clients</a></li>
         </ul>
 
@@ -65,8 +66,9 @@
     <div class="mobile-menu" id="mmenu">
         <a href="#about" onclick="closeNav()">About</a>
         <a href="#services" onclick="closeNav()">Services</a>
+        <a href="#projects" id="mmenuProjectsLink" onclick="closeNav()">Projects</a>
         <a href="#process" onclick="closeNav()">How It Works</a>
-        <!-- <a href="#team" onclick="closeNav()">Team</a> -->
+        <a href="#team" id="mmenuTeamLink" onclick="closeNav()">Team</a>
         <a href="#testimonials" onclick="closeNav()">Clients</a>
         <a href="#contact" class="mm-cta" onclick="closeNav()">Get a Quote →</a>
     </div>
@@ -424,6 +426,21 @@
         </div>
     </section>
 
+    <!-- ══════════════ PROJECTS ══════════════ -->
+    <section id="projects">
+        <div class="svc-header svc-header-stack">
+            <div>
+                <div class="tag fade-in">
+                    <div class="tag-dot"></div>Proven Track Record
+                </div>
+                <h2 class="big fade-in d1" style="margin-top:18px">FEATURED <span class="o">PROJECTS</span></h2>
+            </div>
+            <p class="body-txt fade-in d2">From port clearances to complex regional freight distribution across West Africa, explore some of our successfully delivered logistics operations.</p>
+        </div>
+
+        <div class="project-grid" id="projectGrid"></div>
+    </section>
+
     <!-- ══════════════ QUOTE CALCULATOR ══════════════ -->
     <section id="calculator">
         <div class="calc-wrap">
@@ -501,8 +518,7 @@
         </div>
     </section>
 
-    <!-- ══════════════ TEAM (Hidden) ══════════════ -->
-    <!--
+    <!-- ══════════════ TEAM ══════════════ -->
     <section id="team">
         <div style="max-width:580px">
             <div class="tag fade-in">
@@ -515,7 +531,6 @@
 
         <div class="team-grid" id="teamGrid"></div>
     </section>
-    -->
 
     <!-- ══════════════ WHY US / SHERQ ══════════════ -->
     <section id="network">
@@ -716,7 +731,8 @@
                 <ul>
                     <li><a href="#about">About Us</a></li>
                     <li><a href="#vmv">Vision & Mission</a></li>
-                    <!-- <li><a href="#team">Executive Team</a></li> -->
+                    <li><a href="#projects">Projects</a></li>
+                    <li id="footerTeamLink"><a href="#team">Executive Team</a></li>
                     <li><a href="#network">SHERQ</a></li>
                 </ul>
             </div>

@@ -5,8 +5,18 @@ const upload   = require('../middleware/upload');
 
 const router = express.Router();
 
-// GET /api/projects — all projects (public)
+// GET /api/projects — active projects (public)
 router.get('/', async (req, res) => {
+  try {
+    const projects = await Project.find({ active: { $ne: false } }).sort({ createdAt: -1 });
+    res.json(projects);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// GET /api/projects/all — all projects for admin (protected)
+router.get('/all', auth, async (req, res) => {
   try {
     const projects = await Project.find().sort({ createdAt: -1 });
     res.json(projects);
@@ -18,7 +28,7 @@ router.get('/', async (req, res) => {
 // GET /api/projects/featured — featured only (public)
 router.get('/featured', async (req, res) => {
   try {
-    const projects = await Project.find({ featured: true }).sort({ createdAt: -1 });
+    const projects = await Project.find({ featured: true, active: { $ne: false } }).sort({ createdAt: -1 });
     res.json(projects);
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
@@ -40,11 +50,14 @@ router.get('/:id', async (req, res) => {
 router.post('/', auth, upload.single('image'), async (req, res) => {
   try {
     const data = { ...req.body };
-    if (req.file) data.image = '/uploads/' + req.file.filename;
+    if (req.file) {
+      data.image = req.file.path || req.file.secure_url || req.file.url || ('/uploads/' + req.file.filename);
+    }
     if (data.tags && typeof data.tags === 'string') {
       data.tags = data.tags.split(',').map(t => t.trim()).filter(Boolean);
     }
     data.featured = data.featured === 'true' || data.featured === true;
+    data.active = data.active !== 'false' && data.active !== false;
     const project = await Project.create(data);
     res.status(201).json(project);
   } catch (err) {
@@ -56,11 +69,14 @@ router.post('/', auth, upload.single('image'), async (req, res) => {
 router.put('/:id', auth, upload.single('image'), async (req, res) => {
   try {
     const data = { ...req.body };
-    if (req.file) data.image = '/uploads/' + req.file.filename;
+    if (req.file) {
+      data.image = req.file.path || req.file.secure_url || req.file.url || ('/uploads/' + req.file.filename);
+    }
     if (data.tags && typeof data.tags === 'string') {
       data.tags = data.tags.split(',').map(t => t.trim()).filter(Boolean);
     }
     data.featured = data.featured === 'true' || data.featured === true;
+    data.active = data.active !== 'false' && data.active !== false;
     const project = await Project.findByIdAndUpdate(req.params.id, data, { new: true, runValidators: true });
     if (!project) return res.status(404).json({ error: 'Not found' });
     res.json(project);

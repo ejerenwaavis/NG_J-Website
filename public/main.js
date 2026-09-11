@@ -1,4 +1,4 @@
-﻿        /* ── LOADER ── */
+        /* ── LOADER ── */
         window.addEventListener('load', () => {
             setTimeout(() => {
                 document.getElementById('loader').classList.add('done');
@@ -89,10 +89,7 @@
                 const res = await fetch('/api/services');
                 if (!res.ok) throw new Error('Failed to load services');
                 const allServices = await res.json();
-                const services = allServices.filter(s => {
-                    const cat = (s.category || '').toLowerCase();
-                    return !s.enhanced && !['storage', 'project'].includes(cat);
-                });
+                const services = allServices.filter(s => !s.enhanced);
 
                 if (!services.length) {
                     grid.innerHTML = '<p class="body-txt">Service details will be updated shortly.</p>';
@@ -104,7 +101,7 @@
                     return `
                         <div class="${cardClass}">
                             <div class="sc-img" style="background-image:url('${esc(s.image)}')">
-                                <span class="sc-chip">${esc(s.chip || 'Service')}</span>
+                                <span class="sc-chip">${esc(s.chip || s.category || 'Service')}</span>
                             </div>
                             <div class="sc-body">
                                 <div class="sc-ttl">${esc(s.title)}</div>
@@ -125,8 +122,68 @@
             }
         }
 
+        async function loadProjects() {
+            const grid = document.getElementById('projectGrid');
+            const section = document.getElementById('projects');
+            const navLink = document.getElementById('navProjectsLink');
+            const mmenuLink = document.getElementById('mmenuProjectsLink');
+            if (!grid) return;
+
+            try {
+                const res = await fetch('/api/projects');
+                if (!res.ok) throw new Error('Failed to load projects');
+                const projects = await res.json();
+
+                if (!projects.length) {
+                    if (section) section.style.display = 'none';
+                    if (navLink) navLink.style.display = 'none';
+                    if (mmenuLink) mmenuLink.style.display = 'none';
+                    return;
+                }
+
+                if (section) section.style.display = '';
+                if (navLink) navLink.style.display = '';
+                if (mmenuLink) mmenuLink.style.display = '';
+
+                grid.innerHTML = projects.map((p, idx) => {
+                    const featuredBadge = p.featured ? '<span class="pc-featured">Featured</span>' : '';
+                    const tagsHtml = (p.tags && p.tags.length)
+                        ? `<div class="pc-tags">${p.tags.map(t => `<span class="pc-tag">${esc(t)}</span>`).join('')}</div>`
+                        : '';
+                    const metaItems = [];
+                    if (p.client) metaItems.push(`<div class="pc-meta-item"><span>Client:</span> <strong>${esc(p.client)}</strong></div>`);
+                    if (p.location) metaItems.push(`<div class="pc-meta-item"><span>Location:</span> <strong>${esc(p.location)}</strong></div>`);
+                    if (p.year) metaItems.push(`<div class="pc-meta-item"><span>Year:</span> <strong>${p.year}</strong></div>`);
+                    const metaHtml = metaItems.length ? `<div class="pc-meta">${metaItems.join('')}</div>` : '';
+
+                    return `
+                        <div class="pc fade-in d${Math.min(idx + 1, 4)}">
+                            <div class="pc-img" style="background-image:url('${esc(p.image)}')">
+                                <span class="pc-chip">${esc(p.category || 'Logistics')}</span>
+                                ${featuredBadge}
+                            </div>
+                            <div class="pc-body">
+                                <div class="pc-ttl">${esc(p.title)}</div>
+                                <div class="pc-desc">${esc(p.description)}</div>
+                                ${metaHtml}
+                                ${tagsHtml}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                observeNewFadeIns();
+            } catch (err) {
+                if (section) section.style.display = 'none';
+            }
+        }
+
         async function loadTeam() {
             const teamGrid = document.getElementById('teamGrid');
+            const teamSec = document.getElementById('team');
+            const navTeam = document.getElementById('navTeamLink');
+            const mmenuTeam = document.getElementById('mmenuTeamLink');
+            const footerTeam = document.getElementById('footerTeamLink');
             if (!teamGrid) return;
 
             try {
@@ -135,9 +192,17 @@
                 const members = await res.json();
 
                 if (!members.length) {
-                    teamGrid.innerHTML = '<p class="body-txt">Team details will be updated shortly.</p>';
+                    if (teamSec) teamSec.style.display = 'none';
+                    if (navTeam) navTeam.style.display = 'none';
+                    if (mmenuTeam) mmenuTeam.style.display = 'none';
+                    if (footerTeam) footerTeam.style.display = 'none';
                     return;
                 }
+
+                if (teamSec) teamSec.style.display = '';
+                if (navTeam) navTeam.style.display = '';
+                if (mmenuTeam) mmenuTeam.style.display = '';
+                if (footerTeam) footerTeam.style.display = '';
 
                 teamGrid.innerHTML = members.map((m, idx) => `
                     <div class="tc fade-in d${Math.min(idx, 4)}">
@@ -150,7 +215,7 @@
 
                 observeNewFadeIns();
             } catch (err) {
-                teamGrid.innerHTML = '<p class="body-txt">Unable to load team right now.</p>';
+                if (teamSec) teamSec.style.display = 'none';
             }
         }
 
@@ -287,6 +352,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             loadServices();
+            loadProjects();
             loadTeam();
             loadTestimonials();
         });

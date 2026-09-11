@@ -180,9 +180,10 @@
               <th class="text-left px-5 py-3.5 font-medium">Client</th>
               <th class="text-left px-5 py-3.5 font-medium">Year</th>
               <th class="text-left px-5 py-3.5 font-medium">Featured</th>
+              <th class="text-left px-5 py-3.5 font-medium">Status</th>
               <th class="text-right px-5 py-3.5 font-medium">Actions</th>
             </tr></thead>
-            <tbody id="projectsBody"><tr><td colspan="6" class="text-center py-10 text-silver text-sm">Loading…</td></tr></tbody>
+            <tbody id="projectsBody"><tr><td colspan="7" class="text-center py-10 text-silver text-sm">Loading…</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -319,10 +320,23 @@
       </div>
       <div><label>Year</label><input type="number" id="proj-year" min="2000" max="2099" /></div>
       <div><label>Tags (comma-separated)</label><input type="text" id="proj-tags" placeholder="e.g. cold-chain, Lagos" /></div>
-      <div><label>Image</label><input type="file" id="proj-image" accept="image/*" class="file:bg-navy-lt file:text-white file:border-0 file:rounded-lg file:px-3 file:py-1.5 file:text-xs file:mr-3 file:cursor-pointer cursor-pointer" /></div>
-      <div class="flex items-center gap-2">
-        <input type="checkbox" id="proj-featured" class="w-auto rounded accent-orange" style="width:16px;height:16px;" />
-        <label class="mb-0 normal-case tracking-normal text-sm text-silver" for="proj-featured">Mark as featured</label>
+      <div>
+        <label>Image</label>
+        <input type="file" id="proj-image" accept="image/*" class="file:bg-navy-lt file:text-white file:border-0 file:rounded-lg file:px-3 file:py-1.5 file:text-xs file:mr-3 file:cursor-pointer cursor-pointer" />
+        <div id="proj-image-preview" class="hidden mt-2 flex items-center gap-3 p-2 bg-navy rounded-lg border border-navy-lt">
+          <img id="proj-preview-img" src="" class="w-12 h-12 rounded object-cover" alt="Preview" />
+          <span id="proj-preview-txt" class="text-xs text-silver truncate flex-1">Current image</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-6">
+        <div class="flex items-center gap-2">
+          <input type="checkbox" id="proj-featured" class="w-auto rounded accent-orange" style="width:16px;height:16px;" />
+          <label class="mb-0 normal-case tracking-normal text-sm text-silver" for="proj-featured">Featured</label>
+        </div>
+        <div class="flex items-center gap-2">
+          <input type="checkbox" id="proj-active" checked class="w-auto rounded accent-orange" style="width:16px;height:16px;" />
+          <label class="mb-0 normal-case tracking-normal text-sm text-silver" for="proj-active">Active (Visible)</label>
+        </div>
       </div>
       <div id="proj-err" class="hidden text-red-400 text-sm bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2"></div>
       <button type="submit" class="w-full py-3 bg-orange hover:bg-orange-lt text-white font-semibold text-sm rounded-xl transition-all flex items-center justify-center gap-2" id="proj-submit">
@@ -349,7 +363,14 @@
       <div class="grid grid-cols-2 gap-3">
         <div><label>Order</label><input type="number" id="svc-order" min="0" value="0" /></div>
       </div>
-      <div><label>Image</label><input type="file" id="svc-image" accept="image/*" class="file:bg-navy-lt file:text-white file:border-0 file:rounded-lg file:px-3 file:py-1.5 file:text-xs file:mr-3 file:cursor-pointer cursor-pointer" /></div>
+      <div>
+        <label>Image</label>
+        <input type="file" id="svc-image" accept="image/*" class="file:bg-navy-lt file:text-white file:border-0 file:rounded-lg file:px-3 file:py-1.5 file:text-xs file:mr-3 file:cursor-pointer cursor-pointer" />
+        <div id="svc-image-preview" class="hidden mt-2 flex items-center gap-3 p-2 bg-navy rounded-lg border border-navy-lt">
+          <img id="svc-preview-img" src="" class="w-12 h-12 rounded object-cover" alt="Preview" />
+          <span id="svc-preview-txt" class="text-xs text-silver truncate flex-1">Current image</span>
+        </div>
+      </div>
       <div class="flex items-center gap-6">
         <div class="flex items-center gap-2">
           <input type="checkbox" id="svc-wide" class="w-auto" style="width:16px;height:16px;" />
@@ -587,11 +608,11 @@ function loadSection(s) {
 // ═══════════════════════════════════════
 async function loadProjects() {
   const tbody = document.getElementById('projectsBody');
-  tbody.innerHTML = '<tr><td colspan="6" class="text-center py-10 text-silver text-sm">Loading…</td></tr>';
-  const res  = await api('GET', '/api/projects');
+  tbody.innerHTML = '<tr><td colspan="7" class="text-center py-10 text-silver text-sm">Loading…</td></tr>';
+  const res  = await api('GET', '/api/projects/all');
   if (!res) return;
   const data = await res.json();
-  if (!data.length) { tbody.innerHTML = '<tr><td colspan="6" class="text-center py-10 text-silver text-sm">No projects yet.</td></tr>'; return; }
+  if (!data.length) { tbody.innerHTML = '<tr><td colspan="7" class="text-center py-10 text-silver text-sm">No projects yet.</td></tr>'; return; }
   tbody.innerHTML = data.map(p => `
     <tr class="border-b border-navy-lt/50">
       <td class="px-5 py-3.5 font-medium">${esc(p.title)}</td>
@@ -599,6 +620,7 @@ async function loadProjects() {
       <td class="px-5 py-3.5 text-silver">${esc(p.client || '—')}</td>
       <td class="px-5 py-3.5 text-silver">${p.year || '—'}</td>
       <td class="px-5 py-3.5">${p.featured ? '<span class="badge-featured">Featured</span>' : '<span class="text-silver text-xs">—</span>'}</td>
+      <td class="px-5 py-3.5">${p.active !== false ? '<span class="badge-active">Active</span>' : '<span class="badge-inactive">Hidden</span>'}</td>
       <td class="px-5 py-3.5 text-right">
         <button onclick="editProject('${p._id}')" class="text-silver hover:text-white text-xs px-3 py-1.5 rounded-lg border border-navy-lt hover:border-silver transition-all mr-2">Edit</button>
         <button onclick="confirmDelete('project','${p._id}')" class="text-red-400 hover:text-red-300 text-xs px-3 py-1.5 rounded-lg border border-red-500/20 hover:border-red-400/50 transition-all">Delete</button>
@@ -615,7 +637,11 @@ function resetProjectForm() {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
+  document.getElementById('proj-image').value = '';
+  document.getElementById('proj-image-preview').classList.add('hidden');
+  document.getElementById('proj-preview-img').src = '';
   document.getElementById('proj-featured').checked = false;
+  document.getElementById('proj-active').checked = true;
   document.getElementById('proj-err').classList.add('hidden');
 }
 
@@ -632,6 +658,11 @@ async function editProject(id) {
   document.getElementById('proj-year').value        = p.year || '';
   document.getElementById('proj-tags').value        = (p.tags || []).join(', ');
   document.getElementById('proj-featured').checked  = p.featured;
+  document.getElementById('proj-active').checked    = p.active !== false;
+  if (p.image) {
+    document.getElementById('proj-preview-img').src = p.image;
+    document.getElementById('proj-image-preview').classList.remove('hidden');
+  }
   openProjectModal(true);
 }
 
@@ -651,6 +682,7 @@ document.getElementById('form-project').addEventListener('submit', async e => {
   fd.append('year',        document.getElementById('proj-year').value);
   fd.append('tags',        document.getElementById('proj-tags').value);
   fd.append('featured',    document.getElementById('proj-featured').checked);
+  fd.append('active',      document.getElementById('proj-active').checked);
   const imgFile = document.getElementById('proj-image').files[0];
   if (imgFile) fd.append('image', imgFile);
 
@@ -723,6 +755,9 @@ function resetServiceForm() {
     const el = document.getElementById(id); if (el) el.value = '';
   });
   document.getElementById('svc-order').value  = '0';
+  document.getElementById('svc-image').value  = '';
+  document.getElementById('svc-image-preview').classList.add('hidden');
+  document.getElementById('svc-preview-img').src = '';
   document.getElementById('svc-wide').checked     = false;
   document.getElementById('svc-enhanced').checked = false;
   document.getElementById('svc-active').checked   = true;
@@ -744,6 +779,10 @@ async function editService(id) {
   document.getElementById('svc-wide').checked      = s.wide;
   document.getElementById('svc-enhanced').checked  = !!s.enhanced;
   document.getElementById('svc-active').checked    = s.active;
+  if (s.image) {
+    document.getElementById('svc-preview-img').src = s.image;
+    document.getElementById('svc-image-preview').classList.remove('hidden');
+  }
   document.getElementById('service-modal-title').textContent = 'Edit Service';
   openModal('service');
 }
