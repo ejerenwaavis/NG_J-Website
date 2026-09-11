@@ -42,6 +42,13 @@ app.get('*', (req, res) =>
   res.sendFile(path.join(__dirname, 'public/index.html'))
 );
 
+// Global JSON error handler (e.g. for multer / Cloudinary upload errors)
+app.use((err, req, res, next) => {
+  console.error('Server error:', err);
+  const status = err.status || err.http_code || 500;
+  res.status(status).json({ error: err.message || 'Internal server error' });
+});
+
 // Port with fallback in case the chosen port is in use
 const PORT = process.env.PORT || 3000;
 
