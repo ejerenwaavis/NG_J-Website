@@ -21,7 +21,7 @@ if (cloudName && apiKey && apiSecret) {
   storage = new CloudinaryStorage({
     cloudinary,
     params: {
-      folder: 'ngjswift',
+      folder: process.env.CLOUDINARY_FOLDER || 'ngj',
       allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'],
       public_id: (req, file) => {
         const ext = path.extname(file.originalname).toLowerCase();
